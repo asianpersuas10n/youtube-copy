@@ -8,7 +8,9 @@ import { ReactComponent as ExitFullscreen } from "../SVGs/exitFullscreen.svg";
 import { ReactComponent as HighVolume } from "../SVGs/highVolume.svg";
 import { ReactComponent as LowVolume } from "../SVGs/lowVolume.svg";
 import { ReactComponent as Mute } from "../SVGs/mute.svg";
-import { useEffect, useRef } from "react";
+import { ReactComponent as CC } from "../SVGs/closedCaption.svg";
+import test from "../TestImage/test.jpeg";
+import { useEffect, useRef, useState } from "react";
 
 function Controls({
   videoElement,
@@ -28,20 +30,106 @@ function Controls({
   volumeValue,
   setVolumeValue,
   volumeCheck,
+  ccBool,
+  setCCBool,
+  ccExist,
+  setCCExist,
+  thumbnailRef,
+  videoContainerRef,
 }) {
   const timelineRef = useRef(null);
+  const previewImgRef = useRef(null);
+  const timelineContainerRef = useRef(null);
+
+  function handleScrubbing(e) {
+    const rect = timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, e.pageX - rect.x), rect.width) / rect.width;
+    if ((e.buttons & 1) === 1) {
+      videoContainerRef.current.classList.add("scrubbing");
+      videoElement.pause();
+      setPlayBool(false);
+    } else {
+      videoContainerRef.current.classList.remove("scrubbing");
+      videoElement.currentTime = percent * videoDuration;
+      if (!playBool) {
+        videoElement.play();
+      }
+    }
+    handleTimeline(e);
+  }
+
+  function handleTimeline(e) {
+    const rect = timelineContainerRef.current.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, e.pageX - rect.x), rect.width) / rect.width;
+    const previewImgNumber = Math.max(
+      1,
+      Math.floor((percent * videoDuration) / 10)
+    );
+    previewImgRef.current.src = test; // will call backend images and use previewImgNumber to decide which preview to use
+    e.target.style.setProperty("--preview", percent);
+    if ((e.buttons & 1) === 1) {
+      e.preventDefault();
+      thumbnailRef.current.src = previewImgRef.current.src;
+      timelineContainerRef.current.style.setProperty("--progress", percent);
+    }
+  }
 
   useEffect(() => {
-    const timelineWidth = currentTimeline / videoDuration;
-    timelineRef.current.style.width = timelineWidth * 100 + "%";
+    document.addEventListener("mouseup", (e) => {
+      if ((e.buttons & 1) === 1) {
+        handleScrubbing(e);
+      }
+    });
+    document.addEventListener("mousemove", (e) => {
+      if ((e.buttons & 1) === 1) {
+        handleTimeline(e);
+      }
+    });
+
+    return () => {
+      document.addEventListener("mouseup", (e) => {
+        if ((e.buttons & 1) === 1) {
+          handleScrubbing(e);
+        }
+      });
+      document.addEventListener("mousemove", (e) => {
+        if ((e.buttons & 1) === 1) {
+          handleTimeline(e);
+        }
+      });
+    };
+  });
+
+  useEffect(() => {
     volumeCheck(false);
 
+    timelineContainerRef.current.style.setProperty(
+      "--progress",
+      currentTimeline / videoDuration
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTimeline, videoDuration, volumeValue]);
   return (
     <div className="controls">
-      <div className="timelineContainer">
-        <div className="timeline" ref={timelineRef}></div>
+      <div
+        className="timelineContainer"
+        onMouseMove={(e) => {
+          handleTimeline(e);
+        }}
+        onMouseUp={(e) => {
+          handleScrubbing(e);
+        }}
+        onMouseDown={(e) => {
+          handleScrubbing(e);
+        }}
+        ref={timelineContainerRef}
+      >
+        <div className="timeline" ref={timelineRef}>
+          <img className="previewImage" ref={previewImgRef}></img>
+          <div className="pointer"></div>
+        </div>
       </div>
       <div className="buttons">
         <button className="playButton" onClick={() => handlePlayPause()}>
@@ -85,6 +173,18 @@ function Controls({
           {Math.floor(videoDuration % 60) < 10 ? "0" : null}
           {Math.floor(videoDuration % 60)}
         </div>
+        <button
+          id={ccBool ? "closedCaptions" : "cc"}
+          className={`${ccExist ? "" : ".noCC"}`}
+          onClick={() => {
+            if (!ccExist) {
+              return;
+            }
+            setCCBool(!ccBool);
+          }}
+        >
+          <CC />
+        </button>
         {!fullscreenBool && (
           <button className="miniPlayerButton">
             <MiniPlayer />

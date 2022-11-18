@@ -1,9 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Controls from "../Components/Controls";
 import video from "../TestVideo/testVideo.mp4";
 
 function Watch() {
   const videoRef = useRef(null);
+  const videoContainerRef = useRef(null);
+  const thumbnailRef = useRef(null);
   const [videoElement, setVideoElement] = useState(videoRef.current);
   const [playBool, setPlayBool] = useState(false);
   const [videoDuration, setVideoTotalDuration] = useState(0);
@@ -15,6 +17,8 @@ function Watch() {
   const [highVolumeBool, setHighVolumeBool] = useState(true);
   const [volumeValue, setVolumeValue] = useState(1);
   const [volumeBeforeMute, setVolumeBeforeMute] = useState(0);
+  const [ccBool, setCCBool] = useState(false);
+  const [ccExist, setCCExist] = useState(true);
 
   //handles playing and pausing
 
@@ -61,6 +65,9 @@ function Watch() {
         }
         setVolumeValue(volumeDown);
         break;
+      case "c":
+        ccBool ? setCCBool(false) : setCCBool(true);
+        break;
       default:
         return;
     }
@@ -92,26 +99,23 @@ function Watch() {
         setWasDefault(true);
       }
       setTheaterBool(false);
-      videoElement.requestFullscreen();
+      videoContainerRef.current.requestFullscreen();
     } else {
       if (!wasDefault) {
         setTheaterBool(true);
       }
+      document.exitFullscreen().catch((error) => Promise.resolve(error));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullscreenBool]);
-
-  useLayoutEffect(() => {
-    document.onfullscreenchange = () => setFullscreenBool(false);
-    return () => {
-      document.onfullscreenchange = undefined;
-    };
-  });
 
   //sets up reference to video on page mount
 
   useEffect(() => {
     setVideoElement(videoRef.current);
+    videoRef.current.textTracks[0].mode = "hidden";
+    //delete this when cc is finished
+    setCCExist(false);
   }, []);
 
   //Logic for volume
@@ -153,12 +157,20 @@ function Watch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [muteBool]);
 
+  //Logic for captions
+
+  useEffect(() => {
+    const captions = videoRef.current.textTracks[0];
+    captions.mode = ccBool ? "showing" : "hidden";
+  }, [ccBool]);
+
   return (
     <div id="watch" tabIndex={0} onKeyDown={handleKeyDown}>
       <div
         className={`videoContainer ${theaterBool ? "theater" : ""} ${
           fullscreenBool ? "fullscreen" : ""
         }`}
+        ref={videoContainerRef}
       >
         <video
           autoPlay
@@ -172,7 +184,15 @@ function Watch() {
           onDoubleClick={() =>
             fullscreenBool ? setFullscreenBool(false) : setFullscreenBool(true)
           }
-        ></video>
+        >
+          <track
+            kind="captions"
+            srcLang="en"
+            src={() => {
+              // set up logic for a track to be here
+            }}
+          ></track>
+        </video>
         <Controls
           videoElement={videoElement}
           playBool={playBool}
@@ -191,7 +211,14 @@ function Watch() {
           volumeValue={volumeValue}
           setVolumeValue={setVolumeValue}
           volumeCheck={volumeCheck}
+          ccBool={ccBool}
+          setCCBool={setCCBool}
+          ccExist={ccExist}
+          setCCExist={setCCExist}
+          thumbnailRef={thumbnailRef}
+          videoContainerRef={videoContainerRef}
         />
+        <img className="thumbnail" ref={thumbnailRef}></img>
       </div>
     </div>
   );
