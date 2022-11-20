@@ -40,7 +40,12 @@ function Controls({
   const timelineRef = useRef(null);
   const previewImgRef = useRef(null);
   const timelineContainerRef = useRef(null);
+  const volumeSliderRef = useRef(null);
+  const volumeSliderContainerRef = useRef(null);
+  const volumeContainerRef = useRef(null);
   let scrubbingBool = false;
+  let volumeScrubBool = false;
+  let previousVolume = 0;
 
   //let you interact with timeline;
 
@@ -71,12 +76,63 @@ function Controls({
       1,
       Math.floor((percent * videoDuration) / 10)
     );
+    let previewImagePercent = percent;
     previewImgRef.current.src = test; // will call backend images and use previewImgNumber to decide which preview to use
     e.target.style.setProperty("--preview", percent);
-    if ((e.buttons & 1) === 1) {
+    //need to implement better way to prevent overflow of video container
+    if (percent > 0.925) {
+      previewImagePercent = 0.925;
+    } else if (percent < 0.075) {
+      previewImagePercent = 0.075;
+    }
+    previewImgRef.current.style.setProperty("--preview", previewImagePercent);
+    console.log(percent);
+    if (scrubbingBool) {
       e.preventDefault();
       thumbnailRef.current.src = previewImgRef.current.src;
       timelineContainerRef.current.style.setProperty("--progress", percent);
+    }
+  }
+
+  // interactable volume slider
+
+  function handleVolumeChange(e) {
+    const rect = volumeSliderContainerRef.current.getBoundingClientRect();
+    let percent =
+      Math.min(Math.max(0, e.pageX - rect.x), rect.width) / rect.width;
+    volumeScrubBool = (e.buttons & 1) === 1;
+    if (volumeScrubBool) {
+      volumeContainerRef.current.classList.add("volumeScrub");
+      videoContainerRef.current.classList.add("volumeScrub");
+      volumeSliderContainerRef.current.style.setProperty(
+        "--volumeProgress",
+        percent
+      );
+      setVolumeValue(percent);
+      volumeCheck(false);
+    } else {
+      volumeContainerRef.current.classList.remove("volumeScrub");
+      videoContainerRef.current.classList.remove("volumeScrub");
+    }
+    handleTimeline(e);
+  }
+
+  function handleVolume(e) {
+    const rect = volumeSliderContainerRef.current.getBoundingClientRect();
+    let percent =
+      Math.min(Math.max(0, e.pageX - rect.x), rect.width) / rect.width;
+    if (volumeScrubBool) {
+      e.preventDefault();
+      if (isNaN(percent)) {
+        percent = previousVolume > 0.5 ? 1 : 0;
+      }
+      previousVolume = percent;
+      setVolumeValue(percent);
+      volumeCheck(false);
+      volumeSliderContainerRef.current.style.setProperty(
+        "--volumeProgress",
+        percent
+      );
     }
   }
 
@@ -86,11 +142,15 @@ function Controls({
     document.addEventListener("mouseup", (e) => {
       if (scrubbingBool) {
         handleScrubbing(e);
+      } else if (volumeScrubBool) {
+        handleVolumeChange(e);
       }
     });
     document.addEventListener("mousemove", (e) => {
       if (scrubbingBool) {
         handleTimeline(e);
+      } else if (volumeScrubBool) {
+        handleVolume(e);
       }
     });
 
@@ -98,21 +158,33 @@ function Controls({
       document.addEventListener("mouseup", (e) => {
         if (scrubbingBool) {
           handleScrubbing(e);
+        } else if (volumeScrubBool) {
+          handleVolumeChange(e);
         }
       });
       document.addEventListener("mousemove", (e) => {
         if (scrubbingBool) {
           handleTimeline(e);
+        } else if (volumeScrubBool) {
+          handleVolume(e);
         }
       });
     };
   });
 
-  // updates timeline and voume on either values changing
+  useEffect(() => {
+    volumeSliderContainerRef.current.style.setProperty("--volumeProgress", 1);
+  }, []);
+
+  // constantly updates volume on either volume or timeline values changing
 
   useEffect(() => {
     volumeCheck(false);
 
+    timelineContainerRef.current.style.setProperty(
+      "--progress",
+      currentTimeline / videoDuration
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTimeline, videoDuration, volumeValue]);
   return (
@@ -139,7 +211,7 @@ function Controls({
         <button className="playButton" onClick={() => handlePlayPause()}>
           {playBool ? <Pause /> : <Play />}
         </button>
-        <div className="volumeContainer">
+        <div className="volumeContainer" ref={volumeContainerRef}>
           <button
             className="muteButton"
             onClick={() => {
@@ -154,15 +226,23 @@ function Controls({
               <LowVolume />
             )}
           </button>
-          <input
-            className="volumeSlider"
-            type="range"
-            min="0"
-            max="1"
-            step="any"
-            value={volumeValue}
-            onChange={(e) => setVolumeValue(e.target.value)}
-          ></input>
+          <div
+            className="volumeSliderContainer"
+            onMouseMove={(e) => {
+              handleVolume(e);
+            }}
+            onMouseUp={(e) => {
+              handleVolumeChange(e);
+            }}
+            onMouseDown={(e) => {
+              handleVolumeChange(e);
+            }}
+            ref={volumeSliderContainerRef}
+          >
+            <div className="volumeSlider" ref={volumeSliderRef}>
+              <div className="volumePointer"></div>
+            </div>
+          </div>
         </div>
         <div id="timeDisplay">
           {Math.floor(currentTimeline / 60) > 0
@@ -179,7 +259,7 @@ function Controls({
         </div>
         <button
           id={ccBool ? "closedCaptions" : "cc"}
-          className={`${ccExist ? "" : ".noCC"}`}
+          className={`${ccExist ? "" : "noCC"}`}
           onClick={() => {
             if (!ccExist) {
               return;

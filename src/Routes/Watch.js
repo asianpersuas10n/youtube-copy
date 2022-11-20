@@ -114,7 +114,15 @@ function Watch() {
   useEffect(() => {
     setVideoElement(videoRef.current);
     videoRef.current.textTracks[0].mode = "hidden";
-    //delete this when cc is finished
+    /*
+      
+    delete this when cc is finished
+    ||
+    ||
+    ||
+    ||
+    \/
+    */
     setCCExist(false);
   }, []);
 

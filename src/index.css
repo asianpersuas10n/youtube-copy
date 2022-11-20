@@ -135,7 +135,7 @@ video:-webkit-media-controls-enclosure {
   background-color: rgba(100, 100, 100, .5);
   height: 3px;
   width: 100%;
-  position: relative
+  position: relative;
 }
 
 .timeline::before {
@@ -195,24 +195,11 @@ video:-webkit-media-controls-enclosure {
   display: none;
 }
 
-.videoContainer.scrubbing .controls{
+.videoContainer.scrubbing .controls,
+.videoContainer.volumeScrub .controls {
   opacity: 1;
   transition: none;
   visibility: visible;
-  display: block;
-}
-
-.videoContainer.scrubbing .thumbnail {
-  display: block;
-}
-
-.videoContainer.scrubbing .previewImage,
-.timelineContainer:hover .previewImage {
-  display: block;
-}
-
-.videoContainer.scrubbing .timeline::before,
-.timelineContainer:hover .timeline::before {
   display: block;
 }
 
@@ -232,15 +219,52 @@ video:-webkit-media-controls-enclosure {
   align-items: center;
 }
 
+.volumeSliderContainer {
+  height: 7px;
+  margin-inline: .5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
 .volumeSlider {
+  background-color: rgba(100, 100, 100, .5);
+  height: 3px;
+  position: relative;
   width: 0;
   transform-origin: left;
   transform: scaleX(0);
   transition: width 200ms ease-in-out, transform 200ms ease-in-out ;
 }
 
+.volumeSlider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: calc(100% - var(--volumeProgress) * 100%);
+  background-color: white;
+}
+
+.volumeSlider .volumePointer {
+  position: absolute;
+  transform: translateX(-50%);
+  height: 500%;
+  top: -200%;
+  left: calc(var(--volumeProgress) * 100%);
+  background-color: white;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+}
+
 .volumeContainer:hover .volumeSlider,
 .volumSlider:focus-within {
+  width: 100px;
+  transform: scaleX(1);
+}
+
+.controls .volumeContainer.volumeScrub .volumeSlider {
   width: 100px;
   transform: scaleX(1);
 }
@@ -253,10 +277,7 @@ video:-webkit-media-controls-enclosure {
   border-bottom: 2px solid red;
 }
 
-.noCC {
-  fill: rgba(161, 161, 161, 0.5);
-}
-
-.noCC:hover {
-  opacity: 0.7;
+.buttons button#cc.noCC,
+.buttons button#cc.noCC:hover {
+  opacity: 0.5;
 }
