@@ -40,12 +40,16 @@ function Controls({
   const timelineRef = useRef(null);
   const previewImgRef = useRef(null);
   const timelineContainerRef = useRef(null);
+  let scrubbingBool = false;
+
+  //let you interact with timeline;
 
   function handleScrubbing(e) {
     const rect = timelineContainerRef.current.getBoundingClientRect();
     const percent =
       Math.min(Math.max(0, e.pageX - rect.x), rect.width) / rect.width;
-    if ((e.buttons & 1) === 1) {
+    scrubbingBool = (e.buttons & 1) === 1;
+    if (scrubbingBool) {
       videoContainerRef.current.classList.add("scrubbing");
       videoElement.pause();
       setPlayBool(false);
@@ -76,39 +80,39 @@ function Controls({
     }
   }
 
+  //mounts an event listener so you can scrub when off the video player and unmounts when video unmounts
+
   useEffect(() => {
     document.addEventListener("mouseup", (e) => {
-      if ((e.buttons & 1) === 1) {
+      if (scrubbingBool) {
         handleScrubbing(e);
       }
     });
     document.addEventListener("mousemove", (e) => {
-      if ((e.buttons & 1) === 1) {
+      if (scrubbingBool) {
         handleTimeline(e);
       }
     });
 
     return () => {
       document.addEventListener("mouseup", (e) => {
-        if ((e.buttons & 1) === 1) {
+        if (scrubbingBool) {
           handleScrubbing(e);
         }
       });
       document.addEventListener("mousemove", (e) => {
-        if ((e.buttons & 1) === 1) {
+        if (scrubbingBool) {
           handleTimeline(e);
         }
       });
     };
   });
 
+  // updates timeline and voume on either values changing
+
   useEffect(() => {
     volumeCheck(false);
 
-    timelineContainerRef.current.style.setProperty(
-      "--progress",
-      currentTimeline / videoDuration
-    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTimeline, videoDuration, volumeValue]);
   return (

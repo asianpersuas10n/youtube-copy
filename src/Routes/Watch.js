@@ -75,7 +75,7 @@ function Watch() {
 
   // sets up logic for timeline
 
-  const handleTimeline = () => {
+  const handleTimedisplay = () => {
     setVideoElement(videoRef.current);
     if (videoElement) {
       let videoTotalDuration = Number(videoElement.duration);
@@ -178,7 +178,7 @@ function Watch() {
           id="video"
           src={video}
           onClick={() => handlePlayPause()}
-          onTimeUpdate={handleTimeline}
+          onTimeUpdate={() => handleTimedisplay()}
           onPlay={() => setPlayBool(true)}
           onPause={() => setPlayBool(false)}
           onDoubleClick={() =>
