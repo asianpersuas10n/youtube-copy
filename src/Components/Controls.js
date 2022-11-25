@@ -37,8 +37,12 @@ function Controls({
   thumbnailRef,
   videoContainerRef,
 }) {
+  const [currentDisplayTime, setCurrentDisplayTime] = useState("00:00");
+  const [videoDisplayDuration, setVideoDisplayDuration] = useState("00:00");
+  const [previewTime, setPreviewTime] = useState("00:00");
   const timelineRef = useRef(null);
   const previewImgRef = useRef(null);
+  const previewTimeRef = useRef(null);
   const timelineContainerRef = useRef(null);
   const volumeSliderRef = useRef(null);
   const volumeSliderContainerRef = useRef(null);
@@ -86,6 +90,8 @@ function Controls({
       previewImagePercent = 0.075;
     }
     previewImgRef.current.style.setProperty("--preview", previewImagePercent);
+    previewTimeRef.current.style.setProperty("--preview", previewImagePercent);
+    setPreviewTime(displayTime(percent * videoDuration));
     console.log(percent);
     if (scrubbingBool) {
       e.preventDefault();
@@ -136,6 +142,19 @@ function Controls({
     }
   }
 
+  // displays time
+
+  function displayTime(timeVariable) {
+    let timeString = "";
+    timeString +=
+      Math.floor(timeVariable / 60) > 0
+        ? Math.floor(timeVariable / 60) + ":"
+        : "0:";
+    timeString += Math.floor(timeVariable % 60) < 10 ? "0" : "";
+    timeString += Math.floor(timeVariable % 60);
+    return timeString;
+  }
+
   //mounts an event listener so you can scrub when off the video player and unmounts when video unmounts
 
   useEffect(() => {
@@ -180,6 +199,8 @@ function Controls({
 
   useEffect(() => {
     volumeCheck(false);
+    setCurrentDisplayTime(displayTime(currentTimeline));
+    setVideoDisplayDuration(displayTime(videoDuration));
 
     timelineContainerRef.current.style.setProperty(
       "--progress",
@@ -204,94 +225,95 @@ function Controls({
       >
         <div className="timeline" ref={timelineRef}>
           <img className="previewImage" ref={previewImgRef}></img>
+          <div className="previewTime" ref={previewTimeRef}>
+            {previewTime}
+          </div>
           <div className="pointer"></div>
         </div>
       </div>
       <div className="buttons">
-        <button className="playButton" onClick={() => handlePlayPause()}>
-          {playBool ? <Pause /> : <Play />}
-        </button>
-        <div className="volumeContainer" ref={volumeContainerRef}>
-          <button
-            className="muteButton"
-            onClick={() => {
-              volumeCheck(true);
-            }}
-          >
-            {muteBool ? (
-              <Mute />
-            ) : highVolumeBool ? (
-              <HighVolume />
-            ) : (
-              <LowVolume />
-            )}
+        <div className="divider">
+          <button className="playButton" onClick={() => handlePlayPause()}>
+            {playBool ? <Pause /> : <Play />}
           </button>
-          <div
-            className="volumeSliderContainer"
-            onMouseMove={(e) => {
-              handleVolume(e);
-            }}
-            onMouseUp={(e) => {
-              handleVolumeChange(e);
-            }}
-            onMouseDown={(e) => {
-              handleVolumeChange(e);
-            }}
-            ref={volumeSliderContainerRef}
-          >
-            <div className="volumeSlider" ref={volumeSliderRef}>
-              <div className="volumePointer"></div>
+          <div className="volumeContainer" ref={volumeContainerRef}>
+            <button
+              className="muteButton"
+              onClick={() => {
+                volumeCheck(true);
+              }}
+            >
+              {muteBool ? (
+                <Mute />
+              ) : highVolumeBool ? (
+                <HighVolume />
+              ) : (
+                <LowVolume />
+              )}
+            </button>
+            <div
+              className="volumeSliderContainer"
+              onMouseMove={(e) => {
+                handleVolume(e);
+              }}
+              onMouseUp={(e) => {
+                handleVolumeChange(e);
+              }}
+              onMouseDown={(e) => {
+                handleVolumeChange(e);
+              }}
+              ref={volumeSliderContainerRef}
+            >
+              <div className="volumeSlider" ref={volumeSliderRef}>
+                <div className="volumePointer"></div>
+              </div>
             </div>
           </div>
+          <div id="timeDisplay">
+            {currentDisplayTime}
+            {" / "}
+            {videoDisplayDuration}
+          </div>
         </div>
-        <div id="timeDisplay">
-          {Math.floor(currentTimeline / 60) > 0
-            ? Math.floor(currentTimeline / 60) + ":"
-            : "0:"}
-          {Math.floor(currentTimeline % 60) < 10 ? "0" : null}
-          {Math.floor(currentTimeline % 60)}
-          {" / "}
-          {Math.floor(videoDuration / 60) > 0
-            ? Math.floor(videoDuration / 60) + ":"
-            : "0:"}
-          {Math.floor(videoDuration % 60) < 10 ? "0" : null}
-          {Math.floor(videoDuration % 60)}
-        </div>
-        <button
-          id={ccBool ? "closedCaptions" : "cc"}
-          className={`${ccExist ? "" : "noCC"}`}
-          onClick={() => {
-            if (!ccExist) {
-              return;
-            }
-            setCCBool(!ccBool);
-          }}
-        >
-          <CC />
-        </button>
-        {!fullscreenBool && (
-          <button className="miniPlayerButton">
-            <MiniPlayer />
-          </button>
-        )}
-        {!fullscreenBool && (
+        <div className="divider">
           <button
-            className="theaterButton"
+            id={ccBool ? "closedCaptions" : "cc"}
+            className={`${ccExist ? "" : "noCC"}`}
             onClick={() => {
-              theaterBool ? setTheaterBool(false) : setTheaterBool(true);
+              if (!ccExist) {
+                return;
+              }
+              setCCBool(!ccBool);
             }}
           >
-            {theaterBool ? <ExitTheater /> : <Theater />}
+            <CC />
           </button>
-        )}
-        <button
-          className="fullScreenButton"
-          onClick={() => {
-            fullscreenBool ? setFullscreenBool(false) : setFullscreenBool(true);
-          }}
-        >
-          {fullscreenBool ? <ExitFullscreen /> : <Fullscreen />}
-        </button>
+          {!fullscreenBool && (
+            <button className="miniPlayerButton">
+              <MiniPlayer />
+            </button>
+          )}
+          {!fullscreenBool && (
+            <button
+              className="theaterButton"
+              onClick={() => {
+                theaterBool ? setTheaterBool(false) : setTheaterBool(true);
+              }}
+            >
+              {theaterBool ? <ExitTheater /> : <Theater />}
+            </button>
+          )}
+          <button
+            className="fullScreenButton"
+            onClick={() => {
+              fullscreenBool
+                ? setFullscreenBool(false)
+                : setFullscreenBool(true);
+            }}
+          >
+            {fullscreenBool ? <ExitFullscreen /> : <Fullscreen />}
+          </button>
+        </div>
       </div>
     </div>
   );
