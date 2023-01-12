@@ -1,5 +1,257 @@
+import { ReactComponent as Menu } from "../SVGs/hamburgerMenu.svg";
+import { ReactComponent as SearchIcon } from "../SVGs/searchIcon.svg";
+import { ReactComponent as Microphone } from "../SVGs/microphone.svg";
+import { ReactComponent as Upload } from "../SVGs/upload.svg";
+import { ReactComponent as UploadActive } from "../SVGs/uploadActive.svg";
+import { ReactComponent as Notification } from "../SVGs/notification.svg";
+import { ReactComponent as NotificationActive } from "../SVGs/notificationActive.svg";
+import { ReactComponent as Elipsis } from "../SVGs/elipsis.svg";
+import { ReactComponent as SignIn } from "../SVGs/signIn.svg";
+import { ReactComponent as UploadVideo } from "../SVGs/uploadVideo.svg";
+import { ReactComponent as CreatePost } from "../SVGs/createPost.svg";
+import { ReactComponent as Hide } from "../SVGs/hide.svg";
+import test from "../TestImage/test.jpeg";
+import { useContext, useEffect, useState } from "react";
+import { StoreContext } from "../Components/Data";
+
 function Navbar() {
-  return <div className="navbar"></div>;
+  const { searchFocusStore } = useContext(StoreContext);
+  const [serchFocus, setSearchFocus] = searchFocusStore;
+  const dataHandler = {
+    test: {
+      channelName: "test",
+      profilePicture: "srcPlaceholder",
+      recentVideoID: "testid",
+    },
+    testid: {
+      videoName: "testName",
+      thumbnail: "test",
+      timeUploaded: 1000000,
+    },
+  };
+  const notificationList = [
+    { channelID: "test" },
+    { channelID: "test" },
+    { channelID: "test" },
+    { channelID: "test" },
+    { channelID: "test" },
+  ];
+  let loggedIn = true;
+  const [uploadClick, setUploadClick] = useState(false);
+  const [notificationClick, setNotificationClick] = useState(false);
+  const [elipsisClick, setElipsisClick] = useState(-1);
+
+  useEffect(() => {
+    document.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("upload") && uploadClick) {
+        setUploadClick(false);
+      }
+      if (!e.target.classList.contains("notification") && notificationClick) {
+        setNotificationClick(false);
+        setElipsisClick(false);
+      }
+    });
+  });
+
+  const handleElipsisClick = (element, bool) => {
+    setElipsisClick(bool ? element : -1);
+  };
+
+  return (
+    <div id="navbarContainer" className="navbar">
+      <div id="container">
+        <div id="start">
+          <button className="navButtons">
+            <div className="svgContainer">
+              <Menu />
+            </div>
+          </button>
+          <a id="logo" href="/" title="YouTube Home">
+            test
+          </a>
+        </div>
+        <div id="center">
+          <div id="centerContainer">
+            <form id="searchForm" action="/results">
+              <div id="container">
+                <input
+                  id="search"
+                  autocapitalize="none"
+                  autocomplete="off"
+                  autocorrect="off"
+                  tabindex="0"
+                  type="text"
+                  placeholder="Search"
+                  onFocus={() => setSearchFocus(true)}
+                  onBlur={() => setSearchFocus(false)}
+                />
+                <div id="searchIcon" className="svgContainer">
+                  <SearchIcon />
+                </div>
+              </div>
+            </form>
+            <button id="searchButton">
+              <div className="svgContainer">
+                <SearchIcon />
+              </div>
+            </button>
+            <button id="microphone" className="navButtons">
+              <div className="svgContainer">
+                <Microphone />
+              </div>
+            </button>
+          </div>
+        </div>
+        <div id="end">
+          {loggedIn && (
+            <div id="loggedInButtons">
+              <div id="upload" className="upload">
+                <button
+                  className="navButtons upload"
+                  onClick={() => {
+                    uploadClick ? setUploadClick(false) : setUploadClick(true);
+                  }}
+                >
+                  <div className="svgContainer upload">
+                    {uploadClick ? (
+                      <UploadActive className="upload" />
+                    ) : (
+                      <Upload className="upload" />
+                    )}
+                  </div>
+                </button>
+                {uploadClick && (
+                  <div className="dropdown upload">
+                    <div className="dropdownButton">
+                      <div className="svgContainer">
+                        <UploadVideo />
+                      </div>
+                      <span>Upload video</span>
+                    </div>
+                    <div className="dropdownButton">
+                      <div className="svgContainer">
+                        <CreatePost />
+                      </div>
+                      <span>Create post</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div id="notification" className="notification">
+                <button
+                  className="navButtons notification"
+                  onClick={() => {
+                    notificationClick
+                      ? setNotificationClick(false)
+                      : setNotificationClick(true);
+                  }}
+                >
+                  <div className="svgContainer notification">
+                    {notificationClick ? (
+                      <NotificationActive className="notification" />
+                    ) : (
+                      <Notification className="notification" />
+                    )}
+                  </div>
+                </button>
+                {notificationClick && (
+                  <div className="dropdown notification">
+                    <div className="notificationHeader notification">
+                      <div className="notification">Notifications</div>
+                      <div>cogwheel svg</div>
+                    </div>
+                    {notificationList.map((val, index) => {
+                      let channelName,
+                        profilePicture,
+                        recentVideoID,
+                        thumbnail,
+                        timeUploaded,
+                        videoName;
+                      if (val.channelID in dataHandler) {
+                        ({ channelName, profilePicture, recentVideoID } =
+                          dataHandler[val.channelID]);
+                        if (recentVideoID in dataHandler) {
+                          ({ thumbnail, timeUploaded, videoName } =
+                            dataHandler[recentVideoID]);
+                        } else {
+                          //video api call here
+                        }
+                      } else {
+                        //channel api call here
+                      }
+                      return (
+                        <div className="dropdownButton" key={"100" + index}>
+                          <div className="blueDot"></div>
+                          <div
+                            className="profile notification"
+                            src={profilePicture}
+                          ></div>
+                          <div className="titleAndTime">
+                            <p className="videoTitle">
+                              {channelName} uploaded: {videoName}
+                            </p>
+                            <p className="time">{timeUploaded}</p>
+                          </div>
+                          <div className="notificationThumbnail">
+                            <img src={test} alt="thumbnail"></img>
+                          </div>
+                          <div>
+                            <button
+                              className="navButtons notification"
+                              onClick={() => {
+                                handleElipsisClick(
+                                  index,
+                                  elipsisClick === index ? false : true
+                                );
+                              }}
+                            >
+                              <div className="svgContainer notification elipsis">
+                                <Elipsis className="notification" />
+                              </div>
+                            </button>
+                            {elipsisClick === index && (
+                              <div className="dropdown notification elipsis">
+                                <div className="dropdownButton">
+                                  <div className="svgContainer">
+                                    <Hide />
+                                  </div>
+                                  <div className="hideNotification">
+                                    <span>Hide this notification</span>
+                                  </div>
+                                </div>
+                                <div className="dropdownButton hideAll">
+                                  <span>Turn off all from channel</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <button className="navButtons">
+            <div className="svgContainer">
+              {loggedIn ? /*profile pic goes here*/ null : <Elipsis />}
+            </div>
+          </button>
+          {!loggedIn && (
+            <div id="signIn">
+              <div className="svgContainer">
+                <SignIn />
+              </div>
+              <div>
+                <span>Sign in</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Navbar;

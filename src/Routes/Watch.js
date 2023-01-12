@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import Navbar from "../Components/Navbar";
+import { useEffect, useRef, useState, useContext } from "react";
 import Controls from "../Components/Controls";
 import video from "../TestVideo/testVideo.mp4";
+import { StoreContext } from "../Components/Data";
 
 function Watch() {
+  const { searchFocusStore } = useContext(StoreContext);
+  const [searchFocus] = searchFocusStore;
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const thumbnailRef = useRef(null);
@@ -26,9 +30,10 @@ function Watch() {
     videoElement.paused ? videoElement.play() : videoElement.pause();
   };
 
-  //keydown shortcuts
+  //keydown shortcuts for the video player
 
   const handleKeyDown = (e) => {
+    if (searchFocus) return;
     const keyPress = e.key.toLowerCase();
     switch (keyPress) {
       case " ":
@@ -109,7 +114,7 @@ function Watch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullscreenBool]);
 
-  //sets up reference to video on page mount
+  //sets up reference to video on page mount and adds event listeners
 
   useEffect(() => {
     setVideoElement(videoRef.current);
@@ -172,8 +177,32 @@ function Watch() {
     captions.mode = ccBool ? "showing" : "hidden";
   }, [ccBool]);
 
+  //fully exit fullscreen
+
+  useEffect(() => {
+    document.addEventListener("fullscreenchange", () => {
+      if (
+        !document.webkitIsFullScreen &&
+        !document.mozFullScreen &&
+        !document.msFullscreenElement
+      ) {
+        setFullscreenBool(false);
+      }
+    });
+    return document.addEventListener("fullscreenchange", () => {
+      if (
+        !document.webkitIsFullScreen &&
+        !document.mozFullScreen &&
+        !document.msFullscreenElement
+      ) {
+        setFullscreenBool(false);
+      }
+    });
+  }, []);
+
   return (
     <div id="watch" tabIndex={0} onKeyDown={handleKeyDown}>
+      <Navbar />
       <div
         className={`videoContainer ${theaterBool ? "theater" : ""} ${
           fullscreenBool ? "fullscreen" : ""

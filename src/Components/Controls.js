@@ -10,7 +10,8 @@ import { ReactComponent as LowVolume } from "../SVGs/lowVolume.svg";
 import { ReactComponent as Mute } from "../SVGs/mute.svg";
 import { ReactComponent as CC } from "../SVGs/closedCaption.svg";
 import test from "../TestImage/test.jpeg";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
+import { StoreContext } from "../Components/Data";
 
 function Controls({
   videoElement,
@@ -37,6 +38,8 @@ function Controls({
   thumbnailRef,
   videoContainerRef,
 }) {
+  const { searchFocusStore } = useContext(StoreContext);
+  const [searchFocus, setSearchFocus] = searchFocusStore;
   const [currentDisplayTime, setCurrentDisplayTime] = useState("00:00");
   const [videoDisplayDuration, setVideoDisplayDuration] = useState("00:00");
   const [previewTime, setPreviewTime] = useState("00:00");
@@ -120,7 +123,7 @@ function Controls({
       volumeContainerRef.current.classList.remove("volumeScrub");
       videoContainerRef.current.classList.remove("volumeScrub");
     }
-    handleTimeline(e);
+    handleVolume(e);
   }
 
   function handleVolume(e) {
@@ -224,7 +227,7 @@ function Controls({
         ref={timelineContainerRef}
       >
         <div className="timeline" ref={timelineRef}>
-          <img className="previewImage" ref={previewImgRef}></img>
+          <img className="previewImage" ref={previewImgRef} alt="preview"></img>
           <div className="previewTime" ref={previewTimeRef}>
             {previewTime}
           </div>
@@ -309,6 +312,8 @@ function Controls({
               fullscreenBool
                 ? setFullscreenBool(false)
                 : setFullscreenBool(true);
+              setSearchFocus(false);
+              console.log(searchFocus);
             }}
           >
             {fullscreenBool ? <ExitFullscreen /> : <Fullscreen />}
