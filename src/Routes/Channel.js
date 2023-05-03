@@ -74,6 +74,16 @@ function Channel() {
     });
   }
 
+  function fileCheck() {
+    const file = videoFileRef.current.files[0];
+    const regexTest = /video\//;
+    console.log(file, file.size > 100000000 || !regexTest.test(file.type));
+    if (file.size > 100000000 || !regexTest.test(file.type)) {
+      alert("too large or wrong file type");
+      videoFileRef.current.value = "";
+    }
+  }
+
   return (
     <div id="channel">
       <Navbar />
@@ -85,7 +95,8 @@ function Channel() {
               <input
                 ref={videoFileRef}
                 type="file"
-                accept=".MOV, .MPEG-1, .MPEG-2, .MPEG4, .MP4, .MPG, .AVI, .WMV, .MPEGPS, .FLV, .3GP, .WEBM"
+                accept="video/*"
+                onChange={() => fileCheck()}
               ></input>
             </div>
           </div>
@@ -95,11 +106,7 @@ function Channel() {
           </div>
           <div>
             <label htmlFor="uploadedVideoDescription">Description</label>
-            <input id="uploadedVideoDescription"></input>
-          </div>
-          <div>
-            <label htmlFor=""></label>
-            <input id=""></input>
+            <textarea id="uploadedVideoDescription"></textarea>
           </div>
           <button onMouseUp={handleUpload}>upload video</button>
           {uploadProgress > -1 && uploadProgress < 100 && (
