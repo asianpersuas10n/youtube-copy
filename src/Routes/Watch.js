@@ -23,6 +23,9 @@ function Watch() {
   const [volumeBeforeMute, setVolumeBeforeMute] = useState(0);
   const [ccBool, setCCBool] = useState(false);
   const [ccExist, setCCExist] = useState(true);
+  const videoStorage =
+    "https://firebasestorage.googleapis.com/v0/b/popularsiterecreation.appspot.com/o/testVideo.mp4?alt=media&token=cbfa2e6b-b6f4-4d39-99bf-1907e947c0d7";
+  //need this for later when uploading just to get link FirebaseStorage.downloadVideo("testVideo.mp4");
 
   //handles playing and pausing
 
@@ -210,10 +213,9 @@ function Watch() {
         ref={videoContainerRef}
       >
         <video
-          autoPlay
           ref={videoRef}
           id="video"
-          src={video}
+          src={videoStorage}
           onClick={() => handlePlayPause()}
           onTimeUpdate={() => handleTimedisplay()}
           onPlay={() => setPlayBool(true)}

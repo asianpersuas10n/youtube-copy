@@ -13,10 +13,14 @@ import { ReactComponent as Hide } from "../SVGs/hide.svg";
 import test from "../TestImage/test.jpeg";
 import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "../Components/Data";
+import { db } from "../FirebaseConfig";
+import FirebaseAuth from "../FirebaseAuth";
+import FirebaseFirestore from "../FirebaseFirestore";
 
 function Navbar() {
-  const { searchFocusStore } = useContext(StoreContext);
+  const { searchFocusStore, userStore } = useContext(StoreContext);
   const [serchFocus, setSearchFocus] = searchFocusStore;
+  const [user] = userStore;
   const dataHandler = {
     test: {
       channelName: "test",
@@ -36,7 +40,7 @@ function Navbar() {
     { channelID: "test" },
     { channelID: "test" },
   ];
-  let loggedIn = true;
+  const [loggedIn, setLoggedIn] = useState(false);
   const [uploadClick, setUploadClick] = useState(false);
   const [notificationClick, setNotificationClick] = useState(false);
   const [elipsisClick, setElipsisClick] = useState(-1);
@@ -52,6 +56,64 @@ function Navbar() {
       }
     });
   });
+
+  useEffect(() => {
+    handleUserInfo();
+  }, [user]);
+
+  async function handleLogin() {
+    try {
+      await FirebaseAuth.login();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleUserInfo() {
+    try {
+      let tempID;
+      const queries = [{ field: "uid", condition: "==", value: user.uid }];
+      const isCurrentUser = await FirebaseFirestore.readDocuments({
+        collectionType: "users",
+        queries: queries,
+      });
+      const userData = isCurrentUser.docs.map((doc) => {
+        tempID = doc.id;
+        return doc.data();
+      });
+
+      if (userData[0]) {
+        console.log(userData);
+        if (
+          user.photoURL !== userData[0].photoURL ||
+          user.displayName !== userData[0].displayName ||
+          user.email !== userData[0].email
+        ) {
+          FirebaseFirestore.updateDocument("users", tempID, {
+            uid: user.uid,
+            photoURL: user.photoURL,
+            displayName: user.displayName,
+            email: user.email,
+            videos: [],
+          });
+        }
+      } else {
+        await FirebaseFirestore.createDocument("users", {
+          uid: user.uid,
+          photoURL: user.photoURL,
+          displayName: user.displayName,
+          email: user.email,
+          videos: [],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleLogout() {
+    await FirebaseAuth.logoutUser();
+  }
 
   const handleElipsisClick = (element, bool) => {
     setElipsisClick(bool ? element : -1);
@@ -76,21 +138,21 @@ function Navbar() {
               <div id="container">
                 <input
                   id="search"
-                  autocapitalize="none"
-                  autocomplete="off"
-                  autocorrect="off"
-                  tabindex="0"
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  tabIndex="0"
                   type="text"
                   placeholder="Search"
-                  onFocus={() => setSearchFocus(true)}
-                  onBlur={() => setSearchFocus(false)}
+                  onFocus={setSearchFocus(true)}
+                  onBlur={setSearchFocus(false)}
                 />
                 <div id="searchIcon" className="svgContainer">
                   <SearchIcon />
                 </div>
               </div>
             </form>
-            <button id="searchButton">
+            <button type="button" id="searchButton">
               <div className="svgContainer">
                 <SearchIcon />
               </div>
@@ -103,7 +165,7 @@ function Navbar() {
           </div>
         </div>
         <div id="end">
-          {loggedIn && (
+          {user && (
             <div id="loggedInButtons">
               <div id="upload" className="upload">
                 <button
@@ -233,13 +295,29 @@ function Navbar() {
               </div>
             </div>
           )}
-          <button className="navButtons">
+          <button
+            className="navButtons profilePic"
+            onClick={() => handleLogout()}
+          >
             <div className="svgContainer">
-              {loggedIn ? /*profile pic goes here*/ null : <Elipsis />}
+              {user ? (
+                <img
+                  src={user.photoURL}
+                  alt="profile"
+                  referrerpolicy="no-referrer"
+                ></img>
+              ) : (
+                <Elipsis />
+              )}
             </div>
           </button>
-          {!loggedIn && (
-            <div id="signIn">
+          {!user && (
+            <div
+              id="signIn"
+              onClick={() => {
+                handleLogin();
+              }}
+            >
               <div className="svgContainer">
                 <SignIn />
               </div>

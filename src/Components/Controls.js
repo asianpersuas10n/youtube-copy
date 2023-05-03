@@ -95,7 +95,6 @@ function Controls({
     previewImgRef.current.style.setProperty("--preview", previewImagePercent);
     previewTimeRef.current.style.setProperty("--preview", previewImagePercent);
     setPreviewTime(displayTime(percent * videoDuration));
-    console.log(percent);
     if (scrubbingBool) {
       e.preventDefault();
       thumbnailRef.current.src = previewImgRef.current.src;
@@ -313,7 +312,6 @@ function Controls({
                 ? setFullscreenBool(false)
                 : setFullscreenBool(true);
               setSearchFocus(false);
-              console.log(searchFocus);
             }}
           >
             {fullscreenBool ? <ExitFullscreen /> : <Fullscreen />}
