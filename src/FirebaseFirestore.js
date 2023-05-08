@@ -7,6 +7,8 @@ import {
   where,
   getDocs,
   updateDoc,
+  serverTimestamp,
+  arrayUnion,
 } from "firebase/firestore";
 
 const firestore = firebase.firestore();
@@ -35,9 +37,13 @@ const updateDocument = (collectionType, id, information) => {
 };
 
 const uploadVideo = async (id, url, information) => {
-  await updateDoc(doc(collection(firestore, "users"), id), url);
+  const newInformation = information;
+  newInformation.time = serverTimestamp();
+  await updateDoc(doc(collection(firestore, "users"), id), {
+    videos: arrayUnion(url),
+  });
   await createDocument("videos", {
-    url: information,
+    [url]: newInformation,
   });
 };
 
