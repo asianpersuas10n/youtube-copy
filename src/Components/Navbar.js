@@ -11,7 +11,7 @@ import { ReactComponent as UploadVideo } from "../SVGs/uploadVideo.svg";
 import { ReactComponent as CreatePost } from "../SVGs/createPost.svg";
 import { ReactComponent as Hide } from "../SVGs/hide.svg";
 import test from "../TestImage/test.jpeg";
-import { useContext, useEffect, useState } from "react";
+import { startTransition, useContext, useEffect, useState } from "react";
 import { StoreContext } from "../Components/Data";
 import { db } from "../FirebaseConfig";
 import FirebaseAuth from "../FirebaseAuth";
@@ -48,11 +48,11 @@ function Navbar() {
   useEffect(() => {
     document.addEventListener("click", (e) => {
       if (!e.target.classList.contains("upload") && uploadClick) {
-        setUploadClick(false);
+        startTransition(() => setUploadClick(false));
       }
       if (!e.target.classList.contains("notification") && notificationClick) {
-        setNotificationClick(false);
-        setElipsisClick(false);
+        startTransition(() => setNotificationClick(false));
+        startTransition(() => setElipsisClick(false));
       }
     });
   });
@@ -116,7 +116,7 @@ function Navbar() {
   }
 
   const handleElipsisClick = (element, bool) => {
-    setElipsisClick(bool ? element : -1);
+    startTransition(() => setElipsisClick(bool ? element : -1));
   };
 
   return (
@@ -144,8 +144,8 @@ function Navbar() {
                   tabIndex="0"
                   type="text"
                   placeholder="Search"
-                  onFocus={setSearchFocus(true)}
-                  onBlur={setSearchFocus(false)}
+                  onFocus={startTransition(() => setSearchFocus(true))}
+                  onBlur={startTransition(() => setSearchFocus(false))}
                 />
                 <div id="searchIcon" className="svgContainer">
                   <SearchIcon />
@@ -171,7 +171,9 @@ function Navbar() {
                 <button
                   className="navButtons upload"
                   onClick={() => {
-                    uploadClick ? setUploadClick(false) : setUploadClick(true);
+                    uploadClick
+                      ? startTransition(() => setUploadClick(false))
+                      : startTransition(() => setUploadClick(true));
                   }}
                 >
                   <div className="svgContainer upload">
@@ -204,8 +206,8 @@ function Navbar() {
                   className="navButtons notification"
                   onClick={() => {
                     notificationClick
-                      ? setNotificationClick(false)
-                      : setNotificationClick(true);
+                      ? startTransition(() => setNotificationClick(false))
+                      : startTransition(() => setNotificationClick(true));
                   }}
                 >
                   <div className="svgContainer notification">

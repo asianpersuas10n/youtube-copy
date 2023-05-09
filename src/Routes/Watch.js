@@ -1,5 +1,11 @@
 import Navbar from "../Components/Navbar";
-import { useEffect, useRef, useState, useContext } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useContext,
+  startTransition,
+} from "react";
 import Controls from "../Components/Controls";
 import video from "../TestVideo/testVideo.mp4";
 import { StoreContext } from "../Components/Data";
@@ -25,7 +31,6 @@ function Watch() {
   const [ccExist, setCCExist] = useState(true);
   const videoStorage =
     "https://firebasestorage.googleapis.com/v0/b/popularsiterecreation.appspot.com/o/testVideo.mp4?alt=media&token=cbfa2e6b-b6f4-4d39-99bf-1907e947c0d7";
-  //need this for later when uploading just to get link FirebaseStorage.downloadVideo("testVideo.mp4");
 
   //handles playing and pausing
 
@@ -45,16 +50,20 @@ function Watch() {
         break;
       case "esc":
       case "escape":
-        setFullscreenBool(false);
+        startTransition(() => setFullscreenBool(false));
         break;
       case "f":
-        fullscreenBool ? setFullscreenBool(false) : setFullscreenBool(true);
+        fullscreenBool
+          ? startTransition(() => setFullscreenBool(false))
+          : startTransition(() => setFullscreenBool(true));
         break;
       case "t":
         if (fullscreenBool) {
-          setFullscreenBool(false);
+          startTransition(() => setFullscreenBool(false));
         }
-        theaterBool ? setTheaterBool(false) : setTheaterBool(true);
+        theaterBool
+          ? startTransition(() => setTheaterBool(false))
+          : startTransition(() => setTheaterBool(true));
         break;
       case "m":
         volumeCheck(true);
@@ -64,17 +73,19 @@ function Watch() {
         if (volumeUp > 1) {
           return;
         }
-        setVolumeValue(volumeUp);
+        startTransition(() => setVolumeValue(volumeUp));
         break;
       case "arrowdown":
         const volumeDown = (Math.floor(volumeValue / 0.05) - 1) * 0.05;
         if (volumeDown < 0) {
           return;
         }
-        setVolumeValue(volumeDown);
+        startTransition(() => setVolumeValue(volumeDown));
         break;
       case "c":
-        ccBool ? setCCBool(false) : setCCBool(true);
+        ccBool
+          ? startTransition(() => setCCBool(false))
+          : startTransition(() => setCCBool(true));
         break;
       default:
         return;
@@ -84,12 +95,12 @@ function Watch() {
   // sets up logic for timeline
 
   const handleTimedisplay = () => {
-    setVideoElement(videoRef.current);
+    startTransition(() => setVideoElement(videoRef.current));
     if (videoElement) {
       let videoTotalDuration = Number(videoElement.duration);
       let videoDuration = Number(videoElement.currentTime);
-      setVideoTotalDuration(videoTotalDuration);
-      setCurrentTimeline(videoDuration);
+      startTransition(() => setVideoTotalDuration(videoTotalDuration));
+      startTransition(() => setCurrentTimeline(videoDuration));
     }
   };
 
@@ -102,15 +113,15 @@ function Watch() {
   useEffect(() => {
     if (fullscreenBool) {
       if (theaterBool) {
-        setWasDefault(false);
+        startTransition(() => setWasDefault(false));
       } else {
-        setWasDefault(true);
+        startTransition(() => setWasDefault(true));
       }
-      setTheaterBool(false);
+      startTransition(() => setTheaterBool(false));
       videoContainerRef.current.requestFullscreen();
     } else {
       if (!wasDefault) {
-        setTheaterBool(true);
+        startTransition(() => setTheaterBool(true));
       }
       document.exitFullscreen().catch((error) => Promise.resolve(error));
     }
@@ -120,7 +131,7 @@ function Watch() {
   //sets up reference to video on page mount and adds event listeners
 
   useEffect(() => {
-    setVideoElement(videoRef.current);
+    startTransition(() => setVideoElement(videoRef.current));
     videoRef.current.textTracks[0].mode = "hidden";
     /*
       
@@ -131,7 +142,7 @@ function Watch() {
     ||
     \/
     */
-    setCCExist(false);
+    startTransition(() => setCCExist(false));
   }, []);
 
   //Logic for volume
@@ -141,31 +152,35 @@ function Watch() {
       muteBool ? unmute() : mute();
     } else {
       if (volumeValue > 0.0001) {
-        setMuteBool(false);
+        startTransition(() => setMuteBool(false));
       }
       if (muteBool) {
         return;
       }
-      volumeValue > 0.5 ? setHighVolumeBool(true) : setHighVolumeBool(false);
-      volumeValue == 0 ? slideToMute() : setMuteBool(false);
+      volumeValue > 0.5
+        ? startTransition(() => setHighVolumeBool(true))
+        : startTransition(() => setHighVolumeBool(false));
+      volumeValue == 0
+        ? slideToMute()
+        : startTransition(() => setMuteBool(false));
       videoRef.current.volume = volumeValue;
     }
   };
 
   const slideToMute = () => {
-    setMuteBool(true);
-    setVolumeBeforeMute(1);
+    startTransition(() => setMuteBool(true));
+    startTransition(() => setVolumeBeforeMute(1));
   };
 
   const mute = () => {
-    setVolumeBeforeMute(volumeValue);
-    setMuteBool(true);
-    setVolumeValue(0);
+    startTransition(() => setVolumeBeforeMute(volumeValue));
+    startTransition(() => setMuteBool(true));
+    startTransition(() => setVolumeValue(0));
   };
 
   const unmute = () => {
-    setMuteBool(false);
-    setVolumeValue(volumeBeforeMute);
+    startTransition(() => setMuteBool(false));
+    startTransition(() => setVolumeValue(volumeBeforeMute));
   };
 
   useEffect(() => {
@@ -189,7 +204,7 @@ function Watch() {
         !document.mozFullScreen &&
         !document.msFullscreenElement
       ) {
-        setFullscreenBool(false);
+        startTransition(() => setFullscreenBool(false));
       }
     });
     return document.addEventListener("fullscreenchange", () => {
@@ -198,7 +213,7 @@ function Watch() {
         !document.mozFullScreen &&
         !document.msFullscreenElement
       ) {
-        setFullscreenBool(false);
+        startTransition(() => setFullscreenBool(false));
       }
     });
   }, []);
@@ -215,13 +230,15 @@ function Watch() {
         <video
           ref={videoRef}
           id="video"
-          src={videoStorage}
+          src={video}
           onClick={() => handlePlayPause()}
           onTimeUpdate={() => handleTimedisplay()}
-          onPlay={() => setPlayBool(true)}
-          onPause={() => setPlayBool(false)}
+          onPlay={() => startTransition(() => setPlayBool(true))}
+          onPause={() => startTransition(() => setPlayBool(false))}
           onDoubleClick={() =>
-            fullscreenBool ? setFullscreenBool(false) : setFullscreenBool(true)
+            fullscreenBool
+              ? startTransition(() => setFullscreenBool(false))
+              : startTransition(() => setFullscreenBool(true))
           }
         >
           <track

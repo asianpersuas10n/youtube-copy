@@ -10,7 +10,13 @@ import { ReactComponent as LowVolume } from "../SVGs/lowVolume.svg";
 import { ReactComponent as Mute } from "../SVGs/mute.svg";
 import { ReactComponent as CC } from "../SVGs/closedCaption.svg";
 import test from "../TestImage/test.jpeg";
-import { useEffect, useRef, useState, useContext } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useContext,
+  startTransition,
+} from "react";
 import { StoreContext } from "../Components/Data";
 
 function Controls({
@@ -64,7 +70,7 @@ function Controls({
     if (scrubbingBool) {
       videoContainerRef.current.classList.add("scrubbing");
       videoElement.pause();
-      setPlayBool(false);
+      startTransition(() => setPlayBool(false));
     } else {
       videoContainerRef.current.classList.remove("scrubbing");
       videoElement.currentTime = percent * videoDuration;
@@ -94,7 +100,7 @@ function Controls({
     }
     previewImgRef.current.style.setProperty("--preview", previewImagePercent);
     previewTimeRef.current.style.setProperty("--preview", previewImagePercent);
-    setPreviewTime(displayTime(percent * videoDuration));
+    startTransition(() => setPreviewTime(displayTime(percent * videoDuration)));
     if (scrubbingBool) {
       e.preventDefault();
       thumbnailRef.current.src = previewImgRef.current.src;
@@ -116,7 +122,7 @@ function Controls({
         "--volumeProgress",
         percent
       );
-      setVolumeValue(percent);
+      startTransition(() => setVolumeValue(percent));
       volumeCheck(false);
     } else {
       volumeContainerRef.current.classList.remove("volumeScrub");
@@ -135,7 +141,7 @@ function Controls({
         percent = previousVolume > 0.5 ? 1 : 0;
       }
       previousVolume = percent;
-      setVolumeValue(percent);
+      startTransition(() => setVolumeValue(percent));
       volumeCheck(false);
       volumeSliderContainerRef.current.style.setProperty(
         "--volumeProgress",
@@ -201,8 +207,8 @@ function Controls({
 
   useEffect(() => {
     volumeCheck(false);
-    setCurrentDisplayTime(displayTime(currentTimeline));
-    setVideoDisplayDuration(displayTime(videoDuration));
+    startTransition(() => setCurrentDisplayTime(displayTime(currentTimeline)));
+    startTransition(() => setVideoDisplayDuration(displayTime(videoDuration)));
 
     timelineContainerRef.current.style.setProperty(
       "--progress",
@@ -235,7 +241,10 @@ function Controls({
       </div>
       <div className="buttons">
         <div className="divider">
-          <button className="playButton" onClick={() => handlePlayPause()}>
+          <button
+            className="playButton"
+            onClick={() => startTransition(() => handlePlayPause())}
+          >
             {playBool ? <Pause /> : <Play />}
           </button>
           <div className="volumeContainer" ref={volumeContainerRef}>
@@ -285,7 +294,7 @@ function Controls({
               if (!ccExist) {
                 return;
               }
-              setCCBool(!ccBool);
+              startTransition(() => setCCBool(!ccBool));
             }}
           >
             <CC />
@@ -299,7 +308,9 @@ function Controls({
             <button
               className="theaterButton"
               onClick={() => {
-                theaterBool ? setTheaterBool(false) : setTheaterBool(true);
+                theaterBool
+                  ? startTransition(() => setTheaterBool(false))
+                  : startTransition(() => setTheaterBool(true));
               }}
             >
               {theaterBool ? <ExitTheater /> : <Theater />}
@@ -309,9 +320,9 @@ function Controls({
             className="fullScreenButton"
             onClick={() => {
               fullscreenBool
-                ? setFullscreenBool(false)
-                : setFullscreenBool(true);
-              setSearchFocus(false);
+                ? startTransition(() => setFullscreenBool(false))
+                : startTransition(() => setFullscreenBool(true));
+              startTransition(() => setSearchFocus(false));
             }}
           >
             {fullscreenBool ? <ExitFullscreen /> : <Fullscreen />}
