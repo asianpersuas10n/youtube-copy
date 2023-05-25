@@ -10,12 +10,14 @@ function CommentSection({ id, user }) {
 
   async function lookupComments(videoID) {
     try {
-      const isCurrentUser = await FirebaseFirestore.readDocuments({
+      const commentCollection = await FirebaseFirestore.readDocuments({
         collectionType: `${videoID}startingComments`,
         limits: limit(5),
       });
-      const tempComments = isCurrentUser.docs.map((doc) => {
-        return doc.data();
+      const tempComments = commentCollection.docs.map((doc) => {
+        const commentData = doc.data();
+        commentData.commentId = doc.id;
+        return commentData;
       });
       setComments(tempComments);
       setCommentsLoaded(true);
@@ -31,7 +33,7 @@ function CommentSection({ id, user }) {
 
   return (
     <div>
-      <CommentInput id={id} user={user} />
+      <CommentInput id={id} user={user} startingComment={true} />
       {commentsLoaded &&
         comments.map((info, i) => {
           console.log("test" + `${i}`);

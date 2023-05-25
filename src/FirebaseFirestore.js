@@ -9,6 +9,7 @@ import {
   updateDoc,
   serverTimestamp,
   arrayUnion,
+  getCountFromServer,
 } from "firebase/firestore";
 
 const firestore = firebase.firestore();
@@ -51,11 +52,19 @@ const uploadVideo = async (id, url, information) => {
   });
 };
 
+const count = async (collectionType) => {
+  const collectionCount = await getCountFromServer(
+    collection(firestore, collectionType)
+  );
+  return collectionCount;
+};
+
 const FirebaseFirestore = {
   createDocument,
   readDocuments,
   updateDocument,
   uploadVideo,
+  count,
 };
 
 export default FirebaseFirestore;

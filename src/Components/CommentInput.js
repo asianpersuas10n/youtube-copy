@@ -1,20 +1,29 @@
-import { serverTimestamp } from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import FirebaseFirestore from "../FirebaseFirestore";
+import { db } from "../FirebaseConfig";
 
-function CommentInput({ id, user }) {
+function CommentInput({ id, user, startingComment, repliesId, videoId }) {
   const [commentInput, setCommentInput] = useState("");
 
   async function uploadComment() {
     try {
-      await FirebaseFirestore.createDocument(`${id}startingComments`, {
+      const collectionString = startingComment
+        ? `${id}startingComments`
+        : `${id}replies`;
+      await FirebaseFirestore.createDocument(collectionString, {
         text: commentInput,
         time: serverTimestamp(),
         userID: user.uid,
         likes: 0,
         replies: "",
       });
+      if (!startingComment && !repliesId)
+        await updateDoc(doc(db, `${videoId}startingComments`, id), {
+          replies: collectionString,
+        });
       setCommentInput("");
+      alert("message sent");
     } catch (error) {
       console.log(error);
     }
