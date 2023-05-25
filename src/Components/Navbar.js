@@ -19,7 +19,7 @@ import FirebaseFirestore from "../FirebaseFirestore";
 
 function Navbar() {
   const { searchFocusStore, userStore } = useContext(StoreContext);
-  const [serchFocus, setSearchFocus] = searchFocusStore;
+  const setSearchFocus = searchFocusStore[1];
   const [user] = userStore;
   const dataHandler = {
     test: {

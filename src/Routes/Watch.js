@@ -1,4 +1,3 @@
-import Navbar from "../Components/Navbar";
 import {
   useEffect,
   useRef,
@@ -6,12 +5,17 @@ import {
   useContext,
   startTransition,
 } from "react";
+import Navbar from "../Components/Navbar";
 import Controls from "../Components/Controls";
+import CommentSection from "../Components/CommentSection";
 import video from "../TestVideo/testVideo.mp4";
 import { StoreContext } from "../Components/Data";
+import { storage } from "../FirebaseConfig";
+import { getDownloadURL, ref } from "firebase/storage";
 
 function Watch() {
-  const { searchFocusStore } = useContext(StoreContext);
+  const { searchFocusStore, userStore } = useContext(StoreContext);
+  const [user] = userStore;
   const [searchFocus] = searchFocusStore;
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
@@ -29,18 +33,29 @@ function Watch() {
   const [volumeBeforeMute, setVolumeBeforeMute] = useState(0);
   const [ccBool, setCCBool] = useState(false);
   const [ccExist, setCCExist] = useState(true);
-  const videoStorage =
-    "https://firebasestorage.googleapis.com/v0/b/popularsiterecreation.appspot.com/o/testVideo.mp4?alt=media&token=cbfa2e6b-b6f4-4d39-99bf-1907e947c0d7";
+  const [videoStorage, setVideoStorage] = useState("");
+  const [videoID, setVideoID] = useState();
+
+  //grabs id from firebase video url
+
+  async function pageSetUp() {
+    const reference = window.location.pathname.replace("/watch/", "");
+    console.log(reference);
+    const test = "testVideo.mp4";
+    const getURL = await getDownloadURL(ref(storage, test));
+    setVideoID(test);
+    startTransition(() => setVideoStorage(getURL));
+  }
 
   //handles playing and pausing
 
-  const handlePlayPause = () => {
+  function handlePlayPause() {
     videoElement.paused ? videoElement.play() : videoElement.pause();
-  };
+  }
 
   //keydown shortcuts for the video player
 
-  const handleKeyDown = (e) => {
+  function handleKeyDown(e) {
     if (searchFocus) return;
     const keyPress = e.key.toLowerCase();
     switch (keyPress) {
@@ -90,11 +105,11 @@ function Watch() {
       default:
         return;
     }
-  };
+  }
 
   // sets up logic for timeline
 
-  const handleTimedisplay = () => {
+  function handleTimedisplay() {
     startTransition(() => setVideoElement(videoRef.current));
     if (videoElement) {
       let videoTotalDuration = Number(videoElement.duration);
@@ -102,7 +117,7 @@ function Watch() {
       startTransition(() => setVideoTotalDuration(videoTotalDuration));
       startTransition(() => setCurrentTimeline(videoDuration));
     }
-  };
+  }
 
   //logic for keeping css in working order when entering or exiting fullscreen
 
@@ -131,8 +146,10 @@ function Watch() {
   //sets up reference to video on page mount and adds event listeners
 
   useEffect(() => {
+    pageSetUp();
     startTransition(() => setVideoElement(videoRef.current));
     videoRef.current.textTracks[0].mode = "hidden";
+
     /*
       
     delete this when cc is finished
@@ -147,7 +164,7 @@ function Watch() {
 
   //Logic for volume
 
-  const volumeCheck = (wasMuteClicked) => {
+  function volumeCheck(wasMuteClicked) {
     if (wasMuteClicked) {
       muteBool ? unmute() : mute();
     } else {
@@ -165,23 +182,23 @@ function Watch() {
         : startTransition(() => setMuteBool(false));
       videoRef.current.volume = volumeValue;
     }
-  };
+  }
 
-  const slideToMute = () => {
+  function slideToMute() {
     startTransition(() => setMuteBool(true));
     startTransition(() => setVolumeBeforeMute(1));
-  };
+  }
 
-  const mute = () => {
+  function mute() {
     startTransition(() => setVolumeBeforeMute(volumeValue));
     startTransition(() => setMuteBool(true));
     startTransition(() => setVolumeValue(0));
-  };
+  }
 
-  const unmute = () => {
+  function unmute() {
     startTransition(() => setMuteBool(false));
     startTransition(() => setVolumeValue(volumeBeforeMute));
-  };
+  }
 
   useEffect(() => {
     videoRef.current.muted = !videoRef.current.muted;
@@ -230,7 +247,7 @@ function Watch() {
         <video
           ref={videoRef}
           id="video"
-          src={video}
+          src={videoStorage}
           onClick={() => handlePlayPause()}
           onTimeUpdate={() => handleTimedisplay()}
           onPlay={() => startTransition(() => setPlayBool(true))}
@@ -274,8 +291,9 @@ function Watch() {
           thumbnailRef={thumbnailRef}
           videoContainerRef={videoContainerRef}
         />
-        <img className="thumbnail" ref={thumbnailRef}></img>
+        <img className="thumbnail" ref={thumbnailRef} alt="thumbnail"></img>
       </div>
+      {videoID && <CommentSection id={videoID} user={user} />}
     </div>
   );
 }

@@ -15,8 +15,8 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
-          <Route path="channel" element={<Channel />} />
-          <Route path="watch" element={<Watch />} />
+          <Route path="channel/*" element={<Channel />} />
+          <Route path="watch/*" element={<Watch />} />
         </Routes>
       </BrowserRouter>
     </StoreProvider>

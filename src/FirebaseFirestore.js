@@ -17,7 +17,7 @@ const createDocument = (collectionType, information) => {
   return addDoc(collection(firestore, collectionType), information);
 };
 
-const readDocuments = async ({ collectionType, queries }) => {
+const readDocuments = async ({ collectionType, queries, limits }) => {
   const collectionRef = collection(firestore, collectionType);
   const queryConstraints = [];
 
@@ -25,6 +25,10 @@ const readDocuments = async ({ collectionType, queries }) => {
     for (const query of queries) {
       queryConstraints.push(where(query.field, query.condition, query.value));
     }
+  }
+
+  if (limits) {
+    queryConstraints.push(limits);
   }
 
   const fireStoreQuery = query(collectionRef, ...queryConstraints);

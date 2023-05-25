@@ -61,11 +61,9 @@ function UploadVideo() {
     for (let i = 0; i < arr.length; i++) {
       const uploadRef = ref(
         fireStorage,
-        `images/${Date.now()}${Math.floor(
-          Math.random() * (9 - 0) + 0
-        )}${Math.floor(Math.random() * (9 - 0) + 0)}${Math.floor(
-          Math.random() * (9 - 0) + 0
-        )}${Math.floor(Math.random() * (9 - 0) + 0)}`
+        `images/${Date.now()}${Math.floor(Math.random() * 9)}${Math.floor(
+          Math.random() * 9
+        )}${Math.floor(Math.random() * 9)}${Math.floor(Math.random() * 9)}`
       );
       promises.push(
         uploadBytes(uploadRef, arr[i], { contentType: "image/jpeg" }).then(
