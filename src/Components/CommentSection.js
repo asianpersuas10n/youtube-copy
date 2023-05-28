@@ -7,6 +7,7 @@ import { limit } from "firebase/firestore";
 function CommentSection({ id, user }) {
   const [comments, setComments] = useState();
   const [commentsLoaded, setCommentsLoaded] = useState(false);
+  const [parsedComment, setParsedComments] = useState();
 
   async function lookupComments(videoID) {
     try {
@@ -20,6 +21,20 @@ function CommentSection({ id, user }) {
         return commentData;
       });
       setComments(tempComments);
+      setParsedComments(
+        tempComments.map((info, i) => {
+          return (
+            <div key={Number(`${Date.now()}${i}`)}>
+              <Comment
+                startingComment={true}
+                commentInfo={info}
+                id={id}
+                currentUser={user}
+              />
+            </div>
+          );
+        })
+      );
       setCommentsLoaded(true);
       console.log(tempComments);
     } catch (error) {
@@ -34,19 +49,7 @@ function CommentSection({ id, user }) {
   return (
     <div>
       <CommentInput id={id} user={user} startingComment={true} />
-      {commentsLoaded &&
-        comments.map((info, i) => {
-          console.log("test" + `${i}`);
-          return (
-            <Comment
-              startingComment={true}
-              commentInfo={info}
-              key={Number(`${Date.now()}${i}`)}
-              id={id}
-              currentUser={user}
-            />
-          );
-        })}
+      {parsedComment}
     </div>
   );
 }

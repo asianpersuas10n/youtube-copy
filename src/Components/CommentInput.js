@@ -1,9 +1,12 @@
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { useState } from "react";
+import { useState, startTransition, useContext } from "react";
 import FirebaseFirestore from "../FirebaseFirestore";
 import { db } from "../FirebaseConfig";
+import { StoreContext } from "../Components/Data";
 
 function CommentInput({ id, user, startingComment, repliesId, videoId }) {
+  const { inputFocusStore } = useContext(StoreContext);
+  const setInputFocus = inputFocusStore[1];
   const [commentInput, setCommentInput] = useState("");
 
   async function uploadComment() {
@@ -37,6 +40,8 @@ function CommentInput({ id, user, startingComment, repliesId, videoId }) {
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
           placeholder="Add a comment..."
+          onBlur={() => startTransition(() => setInputFocus(false))}
+          onFocus={() => startTransition(() => setInputFocus(true))}
         ></textarea>
         <div>
           <button>Cancel</button>

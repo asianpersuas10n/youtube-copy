@@ -14,7 +14,9 @@ import { storage } from "../FirebaseConfig";
 import { getDownloadURL, ref } from "firebase/storage";
 
 function Watch() {
-  const { searchFocusStore, userStore } = useContext(StoreContext);
+  const { searchFocusStore, userStore, inputFocusStore } =
+    useContext(StoreContext);
+  const [inputFocus] = inputFocusStore;
   const [user] = userStore;
   const [searchFocus] = searchFocusStore;
   const videoRef = useRef(null);
@@ -56,7 +58,7 @@ function Watch() {
   //keydown shortcuts for the video player
 
   function handleKeyDown(e) {
-    if (searchFocus) return;
+    if (searchFocus || inputFocus) return;
     const keyPress = e.key.toLowerCase();
     switch (keyPress) {
       case " ":

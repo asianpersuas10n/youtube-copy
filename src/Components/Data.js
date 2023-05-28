@@ -1,14 +1,14 @@
 import { createContext, useEffect, useState } from "react";
 import { db } from "../FirebaseConfig";
 import FirebaseAuth from "../FirebaseAuth";
-import {
+/*import {
   collection,
   doc,
   setDoc,
   getDoc,
   query,
   where,
-} from "firebase/firestore";
+} from "firebase/firestore";*/
 export const StoreContext = createContext(null);
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -16,10 +16,11 @@ export default ({ children }) => {
   const [searchFocus, setSearchFocus] = useState(false);
   const [userInformation, setUserInformation] = useState({});
   const [user, setUser] = useState(null);
+  const [inputFocus, setInputFocus] = useState();
 
   FirebaseAuth.subscribeToAuthChanges(setUser);
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log(user);
     databaseUserCall();
     async function databaseUserCall() {
@@ -33,12 +34,13 @@ export default ({ children }) => {
         });
       }
     }
-  }, [user]);
+  }, [user]);*/
 
   const store = {
     searchFocusStore: [searchFocus, setSearchFocus],
     userInformationStore: [userInformation, setUserInformation],
     userStore: [user, setUser],
+    inputFocusStore: [inputFocus, setInputFocus],
   };
 
   return (

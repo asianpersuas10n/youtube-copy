@@ -8,7 +8,7 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
   const [repliesLength, setRepliesLength] = useState(0);
   const [currentReplies, setCurrentReplies] = useState(0);
   const [repliesBool, setRepliesBool] = useState(false);
-  const [user, setUser] = useState({ displayName: "" });
+  const [user, setUser] = useState({ displayName: "test" });
   const [replyBool, setReplyBool] = useState(false);
 
   async function lookupUser(userID) {
@@ -100,12 +100,13 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
                 {repliesBool
                   ? replies.map((info, i) => {
                       return (
-                        <Comment
-                          startingComment={false}
-                          commentInfo={info}
-                          id={commentInfo.commentId}
-                          key={Number(`${Date.now()}${i}`)}
-                        />
+                        <div key={Number(`${Date.now()}${i}`)}>
+                          <Comment
+                            startingComment={false}
+                            commentInfo={info}
+                            id={commentInfo.commentId}
+                          />
+                        </div>
                       );
                     })
                   : null}
