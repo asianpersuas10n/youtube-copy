@@ -311,7 +311,7 @@ form {
   width: 140px;
   height: 90px;
   border-radius: 12px;
-  right: 8px;
+  right: 140px;
   padding-top: 9px;
 }
 
@@ -352,7 +352,7 @@ form {
   width: 480px;
   max-height: 642px;
   border-radius: 12px;
-  right: 60px;
+  right: 86px;
   padding-top: 9px;
   padding-bottom: 8px;
 }
@@ -374,14 +374,12 @@ form {
   padding: 16px 16px 16px 0;
 }
 
-.dropdown.notification .dropdownButton:hover {
-  background-color: #5e5e5e;
-}
-
 .dropdownButton .svgContainer.notification.elipsis svg{
   display: none;
 }
 
+.dropdown.notification .dropdownButton:hover,
+.dropdownButton.profile:hover,
 .navButtons.notification:hover {
   background-color: #5e5e5e;
 }
@@ -390,6 +388,7 @@ form {
   display: flex;
 }
 
+.dropdownButton.profile:active,
 .navButtons.notification:active {
   background-color: #6b6b6b;
 }
@@ -427,6 +426,59 @@ form {
   padding-top: 8px;
   padding-left: 40px;
   white-space: nowrap;
+}
+
+.dropdown.profile {
+  max-width: 300px;
+  outline: none;
+  z-index: 2202;
+  position: fixed;
+  background-color: #353535;
+  box-sizing: border-box;
+  border-radius: 12px;
+  right: 16px;
+  top: 50px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  overflow: hidden;
+}
+
+.dropdownButton.profile {
+  display: flex;
+  padding: 0 12px 0 16px;
+  white-space: nowrap;
+  min-height: 36px;
+  min-width: 300px;
+}
+
+.svgContainer.profile {
+  margin-right: 16px;
+}
+
+.dropdown.profile .profile.profilePic {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.dropdown.profile .profileHeader {
+  display: flex;
+  height: 56px;
+  align-items: center;
+  font-weight: 700;
+  border-bottom: 1px solid #cfcfcf;
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.dropdown.profile .profileHeader img {
+  margin-right: 16px;
+  margin-left: 16px;
+}
+
+.dropdown.profile .dropdownButton {
+  display: flex;
+  align-items: center;
 }
 
 .blueDot {

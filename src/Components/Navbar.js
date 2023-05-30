@@ -10,17 +10,18 @@ import { ReactComponent as SignIn } from "../SVGs/signIn.svg";
 import { ReactComponent as UploadVideo } from "../SVGs/uploadVideo.svg";
 import { ReactComponent as CreatePost } from "../SVGs/createPost.svg";
 import { ReactComponent as Hide } from "../SVGs/hide.svg";
+import { ReactComponent as ChannelSVG } from "../SVGs/channel.svg";
+import { ReactComponent as SignOutSVG } from "../SVGs/signout.svg";
 import test from "../TestImage/test.jpeg";
 import { startTransition, useContext, useEffect, useState } from "react";
 import { StoreContext } from "../Components/Data";
-import { db } from "../FirebaseConfig";
 import FirebaseAuth from "../FirebaseAuth";
 import FirebaseFirestore from "../FirebaseFirestore";
 
 function Navbar() {
   const { searchFocusStore, userStore } = useContext(StoreContext);
   const setSearchFocus = searchFocusStore[1];
-  const [user] = userStore;
+  const [user, setUser] = userStore;
   const dataHandler = {
     test: {
       channelName: "test",
@@ -44,6 +45,7 @@ function Navbar() {
   const [uploadClick, setUploadClick] = useState(false);
   const [notificationClick, setNotificationClick] = useState(false);
   const [elipsisClick, setElipsisClick] = useState(-1);
+  const [profileClick, setProfileClick] = useState(false);
 
   useEffect(() => {
     document.addEventListener("click", (e) => {
@@ -54,16 +56,22 @@ function Navbar() {
         startTransition(() => setNotificationClick(false));
         startTransition(() => setElipsisClick(false));
       }
+      if (!e.target.classList.contains("profile") && profileClick) {
+        startTransition(() => setProfileClick(false));
+      }
     });
   });
 
   useEffect(() => {
-    handleUserInfo();
+    if (loggedIn) {
+      handleUserInfo();
+    }
   }, [user]);
 
   async function handleLogin() {
     try {
       await FirebaseAuth.login();
+      startTransition(() => setLoggedIn(true));
     } catch (error) {
       console.log(error);
     }
@@ -112,6 +120,7 @@ function Navbar() {
   }
 
   async function handleLogout() {
+    startTransition(() => setLoggedIn(false));
     await FirebaseAuth.logoutUser();
   }
 
@@ -165,7 +174,7 @@ function Navbar() {
           </div>
         </div>
         <div id="end">
-          {user && (
+          {loggedIn && (
             <div id="loggedInButtons">
               <div id="upload" className="upload">
                 <button
@@ -185,7 +194,10 @@ function Navbar() {
                   </div>
                 </button>
                 {uploadClick && (
-                  <div className="dropdown upload">
+                  <div
+                    className="dropdown upload"
+                    onClick={() => (window.location.href = "/channel")}
+                  >
                     <div className="dropdownButton">
                       <div className="svgContainer">
                         <UploadVideo />
@@ -298,22 +310,63 @@ function Navbar() {
             </div>
           )}
           <button
-            className="navButtons profilePic"
-            onClick={() => handleLogout()}
+            className="navButtons profilePic profile"
+            onClick={() =>
+              startTransition(() => {
+                const clickBool = profileClick ? false : true;
+                setProfileClick(clickBool);
+              })
+            }
           >
             <div className="svgContainer">
-              {user ? (
+              {loggedIn ? (
                 <img
                   src={user.photoURL}
                   alt="profile"
                   referrerpolicy="no-referrer"
+                  className="profile"
                 ></img>
               ) : (
                 <Elipsis />
               )}
             </div>
           </button>
-          {!user && (
+          {profileClick && (
+            <div className="dropdown profile">
+              {loggedIn && (
+                <div>
+                  <div className="profileHeader">
+                    <img
+                      src={user.photoURL}
+                      alt="profile"
+                      referrerpolicy="no-referrer"
+                      className="profile profilePic"
+                    />
+                    <div>{user.displayName}</div>
+                  </div>
+                  <div
+                    className="dropdownButton profile"
+                    onClick={() => (window.location.href = "/channel")}
+                  >
+                    <div className="svgContainer profile">
+                      <ChannelSVG />
+                    </div>
+                    <div>Your channel</div>
+                  </div>
+                  <div
+                    className="dropdownButton profile"
+                    onClick={() => handleLogout()}
+                  >
+                    <div className="svgContainer profile">
+                      <SignOutSVG />
+                    </div>
+                    <div>Sign out</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          {!loggedIn && (
             <div
               id="signIn"
               onClick={() => {
