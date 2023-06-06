@@ -14,11 +14,11 @@ import {
 
 const firestore = firebase.firestore();
 
-const createDocument = (collectionType, information) => {
+function createDocument(collectionType, information) {
   return addDoc(collection(firestore, collectionType), information);
-};
+}
 
-const readDocuments = async ({ collectionType, queries, limits }) => {
+async function readDocuments({ collectionType, queries, limits }) {
   const collectionRef = collection(firestore, collectionType);
   const queryConstraints = [];
 
@@ -35,29 +35,28 @@ const readDocuments = async ({ collectionType, queries, limits }) => {
   const fireStoreQuery = query(collectionRef, ...queryConstraints);
 
   return getDocs(fireStoreQuery);
-};
+}
 
-const updateDocument = (collectionType, id, information) => {
+function updateDocument(collectionType, id, information) {
   return updateDoc(doc(collection(firestore, collectionType), id), information);
-};
+}
 
-const uploadVideo = async (id, url, information) => {
+async function uploadVideo(id, url, information) {
   const newInformation = information;
   newInformation.time = serverTimestamp();
+  newInformation.url = url;
   await updateDoc(doc(collection(firestore, "users"), id), {
     videos: arrayUnion(url),
   });
-  await createDocument("videos", {
-    [url]: newInformation,
-  });
-};
+  await createDocument("videos", newInformation);
+}
 
-const count = async (collectionType) => {
+async function count(collectionType) {
   const collectionCount = await getCountFromServer(
     collection(firestore, collectionType)
   );
   return collectionCount;
-};
+}
 
 const FirebaseFirestore = {
   createDocument,

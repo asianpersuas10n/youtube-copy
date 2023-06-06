@@ -7,21 +7,21 @@ import {
 
 const auth = firebase.auth();
 
-const logoutUser = () => {
+function logoutUser() {
   return auth.signOut();
-};
+}
 
-const login = () => {
+function login() {
   const provider = new GoogleAuthProvider();
 
   return signInWithPopup(auth, provider);
-};
+}
 
-const subscribeToAuthChanges = (handleAuthChange) => {
+function subscribeToAuthChanges(handleAuthChange) {
   onAuthStateChanged(auth, (user) => {
     handleAuthChange(user);
   });
-};
+}
 
 const FirebaseAuth = {
   logoutUser,

@@ -63,6 +63,9 @@ function Navbar() {
   });
 
   useEffect(() => {
+    if (user?.uid) {
+      setLoggedIn(true);
+    }
     if (loggedIn) {
       handleUserInfo();
     }

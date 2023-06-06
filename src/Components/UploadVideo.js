@@ -168,17 +168,12 @@ function UploadVideo() {
           media.src = reader.result;
         };
         reader.readAsDataURL(tempFile);
-        reader.onerror = (error) => reject(error);
+        reader.onerror = (error) => reject(() => console.log(error));
       });
     const getImages = await videoDuration(file);
     getImages();
   }
 
-  useEffect(() => {
-    if (test2) {
-      setTimeout(() => (uploadButtonRef.current.disabled = false), 1000);
-    }
-  }, [test2]);
   return (
     <div>
       <div>
@@ -213,7 +208,11 @@ function UploadVideo() {
             }
           ></textarea>
         </div>
-        <button onMouseUp={handleUpload} ref={uploadButtonRef} disabled>
+        <button
+          onMouseUp={() => handleUpload()}
+          ref={uploadButtonRef}
+          disabled={!test2}
+        >
           upload video
         </button>
         {uploadProgress > -1 && uploadProgress < 100 && (
