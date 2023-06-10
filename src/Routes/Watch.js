@@ -42,10 +42,8 @@ function Watch() {
 
   async function pageSetUp() {
     const reference = window.location.pathname.replace("/watch/", "");
-    console.log(reference);
-    const test = "testVideo.mp4";
-    const getURL = await getDownloadURL(ref(storage, test));
-    setVideoID(test);
+    const getURL = await getDownloadURL(ref(storage, "videos/" + reference));
+    setVideoID(reference);
     startTransition(() => setVideoStorage(getURL));
   }
 

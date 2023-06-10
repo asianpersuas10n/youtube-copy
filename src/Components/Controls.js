@@ -18,6 +18,7 @@ import {
   startTransition,
 } from "react";
 import { StoreContext } from "../Components/Data";
+import { Timestamp } from "firebase/firestore";
 
 function Controls({
   videoElement,
@@ -160,7 +161,7 @@ function Controls({
         : "0:";
     timeString += Math.floor(timeVariable % 60) < 10 ? "0" : "";
     timeString += Math.floor(timeVariable % 60);
-    return timeString;
+    return timeString.includes("NaN") ? "00:00" : timeString;
   }
 
   //mounts an event listener so you can scrub when off the video player and unmounts when video unmounts

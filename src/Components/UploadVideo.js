@@ -1,10 +1,4 @@
-import {
-  useRef,
-  useState,
-  startTransition,
-  useContext,
-  useEffect,
-} from "react";
+import { useRef, useState, startTransition, useContext } from "react";
 import {
   ref,
   getDownloadURL,
@@ -50,6 +44,7 @@ function UploadVideo() {
         description: description,
         scrubImages: urls,
         thumbnail: urls[0],
+        user: user.uid,
       });
     } catch (error) {
       console.log(error);
