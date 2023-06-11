@@ -778,3 +778,72 @@ form {
   opacity: 0.5;
   cursor: default;
 }
+
+#contentPreview {
+  display: grid;
+}
+
+.contentContainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-bottom: 40px;
+  height: 300px;
+  width: 360px;
+  cursor: pointer;
+  position: relative;
+}
+
+.contentThumbnailContainer {
+  height: 200px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.contentThumbnail {
+  height: 100%;
+  object-fit: contain;
+}
+
+.contentProfile {
+  margin-right: 12px;
+  border-radius: 50%;
+  height: 36px;
+  object-fit: contain;
+}
+
+.contentDuration {
+  position: absolute;
+  background-color: black;
+  left: 328px;
+  top: 172px;
+  transform: translateX(-50%);
+  width: fit-content;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.contentBottom {
+  display: flex;
+  padding-top: 12px;
+}
+
+.contentTextBottom {
+  display: flex;
+}
+
+.contentTextBottom,
+.contentUserName {
+  color:rgba(201, 201, 201, 0.8)
+}
+
+.contentTitle {
+  font-weight: 700;
+}

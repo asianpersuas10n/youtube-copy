@@ -31,6 +31,7 @@ function App() {
         const index = Number(500 + `${i}`);
         return (
           <div
+            className="contentContainer"
             onClick={() => {
               const urlRegex = /\d{17}/;
               const parsedUrl = data.url.match(urlRegex);
@@ -38,14 +39,28 @@ function App() {
             }}
             key={index}
           >
-            <img src={data.thumbnail} alt="thumbnail" />
-            <div>{data.duration}</div>
-            <img src={userMap.photoURL} alt="profile" />
-            <div>
-              <div>{data.title}</div>
-              <div>{userMap.displayName}</div>
-              <div>{data.views} views</div>
-              <div>{data.time.toString()}</div>
+            <div className="contentThumbnailContainer">
+              <img
+                src={data.thumbnail}
+                alt="thumbnail"
+                className="contentThumbnail"
+              />
+            </div>
+            <div className="contentDuration">{data.duration}</div>
+            <div className="contentBottom">
+              <img
+                src={userMap.photoURL}
+                alt="profile"
+                className="contentProfile"
+              />
+              <div className="contentText">
+                <div className="contentTitle">{data.title}</div>
+                <div className="contentUserName">{userMap.displayName}</div>
+                <div className="contentTextBottom">
+                  <div className="contentViews">{data.views} views</div>
+                  <div className="contentDate"> • {data.time.toString()}</div>
+                </div>
+              </div>
             </div>
           </div>
         );
