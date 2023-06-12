@@ -60,7 +60,7 @@ function App() {
                 <div className="contentTextBottom">
                   <div className="contentViews">{data.views} views </div>
                   <div className="contentDate">
-                    • {utilities.generateUploadDate(data.time.toDate())}
+                    • {utilities.generateUploadDate(data.time)}
                   </div>
                 </div>
               </div>

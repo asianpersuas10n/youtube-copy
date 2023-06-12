@@ -5,8 +5,7 @@ function reduceTime(totalTime, time) {
 }
 
 function generateUploadDate(previousDate) {
-  console.log(previousDate);
-  const difference = currentTime.getTime() - previousDate.getTime();
+  const difference = currentTime.getTime() - previousDate.toDate().getTime();
   let generatedTime;
   switch (true) {
     case difference <= 120000:
@@ -34,7 +33,6 @@ function generateUploadDate(previousDate) {
       generatedTime = "time unknown";
       break;
   }
-  console.log(generatedTime);
   return generatedTime;
 }
 

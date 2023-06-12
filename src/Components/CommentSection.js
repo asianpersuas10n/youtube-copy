@@ -36,7 +36,6 @@ function CommentSection({ id, user }) {
         })
       );
       setCommentsLoaded(true);
-      console.log(tempComments);
     } catch (error) {
       console.log(error);
     }

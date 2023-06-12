@@ -2,6 +2,7 @@ import { limit } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import FirebaseFirestore from "../FirebaseFirestore";
 import CommentInput from "./CommentInput";
+import utilities from "../UtilityFunctions";
 
 function Comment({ startingComment, commentInfo, id, currentUser }) {
   const [replies, setReplies] = useState();
@@ -13,7 +14,6 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
 
   async function lookupUser(userID) {
     try {
-      console.log(commentInfo, userID);
       const queries = [{ field: "uid", condition: "==", value: userID }];
       const isCurrentUser = await FirebaseFirestore.readDocuments({
         collectionType: "users",
@@ -51,7 +51,6 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
       setRepliesBool(true);
       setCurrentReplies(tempComments.length + currentReplies);
       alert("replies get");
-      console.log(tempComments);
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +69,7 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
           <div>
             <div>
               <span>{user.displayName}</span>
-              <span>{commentInfo.time.toString()}</span>
+              <span>{utilities.generateUploadDate(commentInfo.time)}</span>
             </div>
             <div>{commentInfo.text}</div>
             <div>
