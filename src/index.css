@@ -720,7 +720,7 @@ form {
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding-right: 16px;
+  margin-right: 16px;
 }
 
 .volumeSlider {
