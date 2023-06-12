@@ -847,3 +847,11 @@ form {
 .contentTitle {
   font-weight: 700;
 }
+
+.contentViews {
+  padding-right: 4px;
+}
+
+.contentUserName {
+  margin-top: 8px;
+}

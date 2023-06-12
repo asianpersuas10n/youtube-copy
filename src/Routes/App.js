@@ -3,6 +3,7 @@ import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import FirebaseFirestore from "../FirebaseFirestore";
+import utilities from "../UtilityFunctions";
 
 function App() {
   const [videos, setVideos] = useState();
@@ -57,8 +58,10 @@ function App() {
                 <div className="contentTitle">{data.title}</div>
                 <div className="contentUserName">{userMap.displayName}</div>
                 <div className="contentTextBottom">
-                  <div className="contentViews">{data.views} views</div>
-                  <div className="contentDate"> • {data.time.toString()}</div>
+                  <div className="contentViews">{data.views} views </div>
+                  <div className="contentDate">
+                    • {utilities.generateUploadDate(data.time.toDate())}
+                  </div>
                 </div>
               </div>
             </div>
