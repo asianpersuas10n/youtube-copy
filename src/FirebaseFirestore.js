@@ -18,7 +18,13 @@ function createDocument(collectionType, information) {
   return addDoc(collection(firestore, collectionType), information);
 }
 
-async function readDocuments({ collectionType, queries, limits }) {
+async function readDocuments({
+  collectionType,
+  queries,
+  orderBy,
+  startAfter,
+  limits,
+}) {
   const collectionRef = collection(firestore, collectionType);
   const queryConstraints = [];
 
@@ -26,6 +32,14 @@ async function readDocuments({ collectionType, queries, limits }) {
     for (const query of queries) {
       queryConstraints.push(where(query.field, query.condition, query.value));
     }
+  }
+
+  if (orderBy) {
+    queryConstraints.push(orderBy);
+  }
+
+  if (startAfter) {
+    queryConstraints.push(startAfter);
   }
 
   if (limits) {

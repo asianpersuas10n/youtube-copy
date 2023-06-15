@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CommentInput from "./CommentInput";
 import Comment from "./Comment";
 import FirebaseFirestore from "../FirebaseFirestore";
-import { limit } from "firebase/firestore";
+import { limit, orderBy } from "firebase/firestore";
 
 function CommentSection({ id, user }) {
   const [comments, setComments] = useState();
@@ -13,6 +13,7 @@ function CommentSection({ id, user }) {
     try {
       const commentCollection = await FirebaseFirestore.readDocuments({
         collectionType: `${videoID}startingComments`,
+        orderBy: orderBy("time", "asc"),
         limits: limit(5),
       });
       const tempComments = commentCollection.docs.map((doc) => {
@@ -24,7 +25,7 @@ function CommentSection({ id, user }) {
       setParsedComments(
         tempComments.map((info, i) => {
           return (
-            <div key={Number(`${Date.now()}${i}`)}>
+            <div key={Number(`${Date.now()}${i}`)} className="commentContent">
               <Comment
                 startingComment={true}
                 commentInfo={info}
@@ -46,9 +47,9 @@ function CommentSection({ id, user }) {
   }, []);
 
   return (
-    <div>
+    <div id="commentSection">
       <CommentInput id={id} user={user} startingComment={true} />
-      {parsedComment}
+      <div id="commentPreview">{parsedComment}</div>
     </div>
   );
 }

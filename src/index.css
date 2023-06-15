@@ -119,6 +119,7 @@ video:-webkit-media-controls-enclosure {
   width: 100%;
 }
 
+#commentSection svg,
 .navbar svg {
   fill:#fff;
 }
@@ -854,4 +855,188 @@ form {
 
 .contentUserName {
   margin-top: 8px;
+}
+
+#commentSection {
+  margin-top: 16px;
+  margin-right: 16px;
+}
+
+#commentSection,
+#commentPreview {
+  display: flex;
+  flex-direction: column;
+}
+
+#commentSection img {
+  border-radius: 50%;
+  height: 40px;
+  margin-right: 16px;
+}
+
+#commentSection .comment .commentInput img, 
+#commentSection .replyComment img {
+  height: 24px;
+}
+
+.commentInput {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.commentInput textarea {
+  background: none;
+  border: none;
+  border-bottom: 1px solid gray;
+  margin-bottom: 9px;
+  width: 100%;
+  resize: none;
+  color: white;
+}
+
+.commentInput textarea:focus {
+  outline: none;
+  border: none;
+  border-bottom: 2px solid white;
+  margin-bottom: 8px;
+}
+
+.commentInputBody {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.comment {
+  display: flex;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.commentUser {
+  margin-right: 4px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.commentBody {
+  width: 100%;
+}
+
+.commentTime {
+  color: gray;
+}
+
+.commentText {
+  margin-top: 4px;
+}
+
+.commentBottom {
+  display: flex;
+  margin-top: 8px;
+}
+
+#commentSection .navButtons {
+  height: 32px;
+  width: 32px;
+  margin-right: 0;
+}
+
+#commentSection .navButtons svg {
+  padding: 4px 4px;
+}
+
+.commentLikes {
+  display: flex;
+  align-items: center;
+}
+
+.commentInputButtons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#commentSection .navButtons.commentCancel {
+  margin-right: 8px;
+}
+
+.thumbsUp,
+.thumbsDown {
+  cursor: pointer;
+}
+
+#commentSection .navButtons.thumbsDown {
+  margin-left: 8px;
+  margin-right: 12px;
+}
+
+#commentSection .navButtons.commentMoreReplies,
+#commentSection .navButtons.commentReply,
+#commentSection .navButtons.commentConfirm,
+#commentSection .navButtons.commentCancel,
+#commentSection .navButtons.reply{
+  border-radius: 16px;
+  height: inherit;
+  width: inherit; 
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#commentSection .navButtons.commentMoreReplies {
+  max-height: 20px;
+  max-width: 144px;
+}
+
+#commentSection .svgContainer.navButtons.commentReply {
+  max-width: 80px;
+  max-height: 20px;
+  padding-left: 4px;
+}
+
+#commentSection .navButtons.commentMoreReplies svg,
+#commentSection .svgContainer.navButtons.commentReply svg{
+  height: 24px;
+  width: 24px;
+  fill: #3ea6ff;
+}
+
+#commentSection .navButtons.commentMoreReplies,
+.commentReply {
+  color: #3ea6ff;
+}
+
+#commentSection .navButtons.commentConfirm {
+  background-color: #363636;
+  color: #6d6d6d;
+  cursor: default;
+}
+
+#commentSection .navButtons.commentConfirm.active {
+  background-color: #3ea6ff;
+  color: black;
+}
+
+#commentSection .navButtons.commentConfirm.active:hover {
+  background-color: #65b8ff;
+}
+
+#commentSection .navButtons.commentConfirm.active:active {
+  background-color: #368cd8;
+}
+
+#commentSection .navButtons.commentMoreReplies:hover,
+#commentSection .svgContainer.navButtons.commentReply:hover {
+  background-color: #3ea5ff3f;
+}
+
+#commentSection .navButtons.commentMoreReplies:active,
+#commentSection .svgContainer.navButtons.commentReply:active {
+  background-color: #3ea5ff91;
+}
+
+.flip {
+  transform: rotate(180deg);
 }
