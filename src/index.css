@@ -858,8 +858,7 @@ form {
 }
 
 #commentSection {
-  margin-top: 16px;
-  margin-right: 16px;
+  margin: 16px 16px;
 }
 
 #commentSection,
@@ -1039,4 +1038,14 @@ form {
 
 .flip {
   transform: rotate(180deg);
+}
+
+#bottomPage {
+  height: 20vh;
+  margin-inline: auto;
+}
+
+#commentCount {
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
