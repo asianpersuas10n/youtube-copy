@@ -224,24 +224,24 @@ function UploadVideo() {
             <span>Upload Complete</span>
           </div>
         )}
-        {test && (
-          <div>
-            <video
-              src={testVideo}
-              onLoadedDataCapture={(e) =>
-                setTimeout(() => getImagesForVideo(e.target), 1000)
-              }
-            ></video>
-          </div>
-        )}
-        {test2 &&
+        <div>
+          <video
+            id="videoCanvas"
+            src={testVideo}
+            onLoadedDataCapture={(e) =>
+              setTimeout(() => getImagesForVideo(e.target), 1000)
+            }
+          ></video>
+        </div>
+        {/*test2 &&
           images.map((image, i) => {
+            const tempImage = URL.createObjectURL(image);
             return (
               <div key={i}>
-                <img src={image} alt="test" />
+                <img src={tempImage} alt="test" />
               </div>
             );
-          })}
+          })*/}
       </div>
       <p>uploaded videos</p>
     </div>

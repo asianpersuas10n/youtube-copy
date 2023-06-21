@@ -1,21 +1,23 @@
-import { limit } from "firebase/firestore";
-import { startTransition, useEffect, useState } from "react";
+import { limit, orderBy, startAfter } from "firebase/firestore";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import FirebaseFirestore from "../FirebaseFirestore";
 import utilities from "../UtilityFunctions";
 
 function App() {
-  const [videos, setVideos] = useState();
+  const [videos, setVideos] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [videoCount, setVideoCount] = useState(0);
+  const [currentVideoCount, setCurrentVideoCount] = useState(0);
+  const [scrollCheck, setScrollCheck] = useState(true);
+  const [lastVisible, setLastVisible] = useState();
+  const bottomRef = useRef(null);
   const navigate = useNavigate();
 
-  async function contentPreview() {
+  async function contentPreview(readRules) {
     try {
-      const getVideos = await FirebaseFirestore.readDocuments({
-        collectionType: "videos",
-        limits: limit(12),
-      });
+      const getVideos = await FirebaseFirestore.readDocuments(readRules);
       const mappedVideos = await Promise.all(
         getVideos.docs.map(async (video) => {
           const data = video.data();
@@ -68,21 +70,71 @@ function App() {
           </div>
         );
       });
-      setVideos(htmlMap);
-      setLoaded(true);
+      setCurrentVideoCount(currentVideoCount + htmlMap.length);
+      setVideos([...videos, ...htmlMap]);
+      if (loaded) {
+      } else {
+        setLoaded(true);
+      }
+      setLastVisible(getVideos.docs[getVideos.docs.length - 1]);
     } catch (error) {
       console.log(error);
     }
   }
 
+  // checks how many total videos there are
+  async function videoTotalCheck() {
+    const count = await FirebaseFirestore.count(`videos`);
+    const parsedCount = count.data().count;
+    setVideoCount(parsedCount);
+  }
+
+  // checks if bottomPage div is fully visible in height on the viewport
+  function infiniteScroll() {
+    if (scrollCheck && videoCount - currentVideoCount !== 0) {
+      window.requestAnimationFrame(() => {
+        setScrollCheck(false);
+        const rect = bottomRef.current.getBoundingClientRect();
+        const elemTop = rect.top;
+        const elemBottom = rect.bottom;
+        if (elemTop >= 0 && elemBottom <= window.innerHeight) {
+          contentPreview({
+            collectionType: "videos",
+            startAfter: startAfter(lastVisible),
+            orderBy: orderBy("time", "desc"),
+            limits: limit(24),
+          });
+        } else {
+          setScrollCheck(true);
+        }
+      });
+    }
+  }
+
+  // sets up event listeners
   useEffect(() => {
-    contentPreview();
+    document.addEventListener("scroll", infiniteScroll);
+    return () => document.removeEventListener("scroll", infiniteScroll);
+  }, [videoCount, currentVideoCount, scrollCheck, lastVisible]);
+
+  useEffect(() => {
+    contentPreview({
+      collectionType: "videos",
+      orderBy: orderBy("time", "desc"),
+      limits: limit(24),
+    });
+    videoTotalCheck();
   }, []);
 
   return (
     <div id="app">
       <Navbar />
       <div id="contentPreview">{loaded && videos}</div>
+      {videoCount - currentVideoCount > 0 ? (
+        <div ref={bottomRef}></div>
+      ) : (
+        <div>You've reached the bottom of the page :)</div>
+      )}
     </div>
   );
 }

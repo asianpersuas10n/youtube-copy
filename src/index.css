@@ -1049,3 +1049,8 @@ form {
   margin-top: 16px;
   margin-bottom: 16px;
 }
+
+#videoCanvas {
+  display: none;
+  visibility: none;
+}

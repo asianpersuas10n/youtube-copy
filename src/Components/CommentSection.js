@@ -97,7 +97,6 @@ function CommentSection({ id, user }) {
         const rect = bottomRef.current.getBoundingClientRect();
         const elemTop = rect.top;
         const elemBottom = rect.bottom;
-        console.log(elemTop >= 0 && elemBottom <= window.innerHeight);
         if (elemTop >= 0 && elemBottom <= window.innerHeight) {
           loadMoreComments(id);
         } else {
@@ -111,7 +110,7 @@ function CommentSection({ id, user }) {
   useEffect(() => {
     document.addEventListener("scroll", infiniteScroll);
     return () => document.removeEventListener("scroll", infiniteScroll);
-  }, [commentCount, currentCount]);
+  }, [commentCount, currentCount, scrollCheck]);
 
   // runs functions on mount
   useEffect(() => {
@@ -126,7 +125,11 @@ function CommentSection({ id, user }) {
       </div>
       <CommentInput id={id} user={user} startingComment={true} />
       <div id="commentPreview">{parsedComment}</div>
-      <div id="bottomPage" ref={bottomRef}></div>
+      {commentCount - currentCount > 0 ? (
+        <div id="bottomPage" ref={bottomRef}></div>
+      ) : (
+        <div>You've reached the bottom :)</div>
+      )}
     </div>
   );
 }
