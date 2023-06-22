@@ -6,7 +6,7 @@ import FirebaseFirestore from "../FirebaseFirestore";
 
 function Channel() {
   const { userStore } = useContext(StoreContext);
-  const [user] = userStore;
+  const user = userStore[0];
   const [pageSetUP, setPageSetUp] = useState(null);
   const [uploadVideo, setUploadVideo] = useState(false);
   const [ownChannel, setOwnChannel] = useState(false);
@@ -18,6 +18,7 @@ function Channel() {
     const reference = window.location.pathname.replace("/channel/", "");
     if (user?.uid === reference) {
       setOwnChannel(true);
+      getUsersVideos(user.videos);
       setPageSetUp(true);
     } else {
       try {
@@ -31,8 +32,8 @@ function Channel() {
         });
         if (data[0] === undefined) throw data[0];
         setUserData(data[0]);
+        getUsersVideos(data[0].videos);
         setPageSetUp(true);
-        console.log("somehow this passed", data[0]);
       } catch (error) {
         setNoUser(true);
         console.log(error);
@@ -40,10 +41,33 @@ function Channel() {
     }
   }
 
+  //gets all of a users video information
+  async function getUsersVideos(url) {
+    try {
+      const promises = [];
+      for (let i = 0; i < url.length; i++) {
+        const queries = [{ field: "url", condition: "==", value: url[0] }];
+        promises.push(
+          FirebaseFirestore.readDocuments({
+            collectionType: "videos",
+            queries: queries,
+          }).then((result) => {
+            const data = result.docs.map((doc) => doc.data());
+            return data[0];
+          })
+        );
+      }
+      const videoArr = await Promise.all(promises);
+      console.log(videoArr);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   // runs on page start
   useEffect(() => {
-    pageSetUp();
-  }, []);
+    pageSetUp(true);
+  }, [user]);
 
   return (
     <div id="channel">
@@ -57,7 +81,7 @@ function Channel() {
                   {ownChannel ? (
                     <img src={user.photoURL} alt="profile" />
                   ) : (
-                    <img src="" alt="profile" />
+                    <img src={userData.photoURL} alt="profile" />
                   )}
                 </div>
                 <div id="channelHeaderText"></div>
