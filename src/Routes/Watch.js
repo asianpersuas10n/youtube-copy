@@ -224,15 +224,16 @@ function Watch() {
         startTransition(() => setFullscreenBool(false));
       }
     });
-    return document.addEventListener("fullscreenchange", () => {
-      if (
-        !document.webkitIsFullScreen &&
-        !document.mozFullScreen &&
-        !document.msFullscreenElement
-      ) {
-        startTransition(() => setFullscreenBool(false));
-      }
-    });
+    return () =>
+      document.removeEventListener("fullscreenchange", () => {
+        if (
+          !document.webkitIsFullScreen &&
+          !document.mozFullScreen &&
+          !document.msFullscreenElement
+        ) {
+          startTransition(() => setFullscreenBool(false));
+        }
+      });
   }, []);
 
   return (

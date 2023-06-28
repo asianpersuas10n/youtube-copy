@@ -3,6 +3,8 @@ import Navbar from "../Components/Navbar";
 import UploadVideo from "../Components/UploadVideo";
 import { StoreContext } from "../Components/Data";
 import FirebaseFirestore from "../FirebaseFirestore";
+import utilities from "../UtilityFunctions";
+import { useNavigate } from "react-router-dom";
 
 function Channel() {
   const { userStore } = useContext(StoreContext);
@@ -12,6 +14,8 @@ function Channel() {
   const [ownChannel, setOwnChannel] = useState(false);
   const [userData, setUserData] = useState();
   const [noUser, setNoUser] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const navigate = useNavigate();
 
   // gets info from url and sets up page
   async function pageSetUp() {
@@ -44,6 +48,7 @@ function Channel() {
   //gets all of a users video information
   async function getUsersVideos(url) {
     try {
+      console.log(url);
       const promises = [];
       for (let i = 0; i < url.length; i++) {
         const queries = [{ field: "url", condition: "==", value: url[0] }];
@@ -58,10 +63,49 @@ function Channel() {
         );
       }
       const videoArr = await Promise.all(promises);
-      console.log(videoArr);
+      formatVideos(videoArr);
     } catch (error) {
       console.log(error);
     }
+  }
+
+  // sets up formating for called videos
+  function formatVideos(videosArr) {
+    const tempVideos = videosArr.map((data, i) => {
+      const index = Number(500 + `${i}`);
+      return (
+        <div
+          className="contentContainer"
+          onClick={() => {
+            const urlRegex = /\d{17}/;
+            const parsedUrl = data.url.match(urlRegex);
+            startTransition(() => navigate("/watch/" + parsedUrl[0]));
+          }}
+          key={index}
+        >
+          <div className="contentThumbnailContainer">
+            <img
+              src={data.thumbnail}
+              alt="thumbnail"
+              className="contentThumbnail"
+            />
+          </div>
+          <div className="contentDuration">{data.duration}</div>
+          <div className="contentBottom">
+            <div className="contentText">
+              <div className="contentTitle">{data.title}</div>
+              <div className="contentTextBottom">
+                <div className="contentViews">{data.views} views </div>
+                <div className="contentDate">
+                  • {utilities.generateUploadDate(data.time)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    });
+    setVideos(tempVideos);
   }
 
   // runs on page start
@@ -100,6 +144,7 @@ function Channel() {
             <div id="channelHeaderBottom"></div>
           </div>
           {uploadVideo && <UploadVideo />}
+          <div id="contentPreview">{videos}</div>
         </div>
       ) : noUser ? (
         <div>No user detected</div>

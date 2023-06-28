@@ -127,9 +127,9 @@ function Navbar() {
     await FirebaseAuth.logoutUser();
   }
 
-  const handleElipsisClick = (element, bool) => {
+  function handleElipsisClick(element, bool) {
     startTransition(() => setElipsisClick(bool ? element : -1));
-  };
+  }
 
   return (
     <div id="navbarContainer" className="navbar">
