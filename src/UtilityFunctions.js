@@ -17,10 +17,10 @@ function generateUploadDate(previousDate) {
     case difference > 3600000 && difference <= 86400000:
       generatedTime = `${reduceTime(difference, 3600000)} hours ago`;
       break;
-    case difference > 86400000 && difference <= 6048000000:
+    case difference > 86400000 && difference <= 604800000:
       generatedTime = `${reduceTime(difference, 86400000)} days ago`;
       break;
-    case difference > 6048000000 && difference <= 2628000000:
+    case difference > 604800000 && difference <= 2628000000:
       generatedTime = `${reduceTime(difference, 6048000000)} weeks ago`;
       break;
     case difference > 2628000000 && difference <= 31540000000:

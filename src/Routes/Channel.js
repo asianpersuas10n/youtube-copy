@@ -118,32 +118,39 @@ function Channel() {
       <Navbar />
       {pageSetUP ? (
         <div id="channelBody">
-          <div id="channelHeader">
-            <div id="channelHeaderTop">
-              <div id="channelHeaderInfo">
-                <div id="channelHeaderImage">
-                  {ownChannel ? (
-                    <img src={user.photoURL} alt="profile" />
-                  ) : (
-                    <img src={userData.photoURL} alt="profile" />
-                  )}
-                </div>
-                <div id="channelHeaderText"></div>
-              </div>
-              {ownChannel && (
-                <div id="channelHeaderButtons">
-                  <div
-                    onClick={() => startTransition(() => setUploadVideo(true))}
-                  >
-                    Upload Video
+          <div id="channelHeaderContainer">
+            <div id="channelHeader">
+              <div id="channelHeaderTop">
+                <div id="channelHeaderInfo">
+                  <div id="channelHeaderImage">
+                    {ownChannel ? (
+                      <img src={user.photoURL} alt="profile" />
+                    ) : (
+                      <img src={userData.photoURL} alt="profile" />
+                    )}
                   </div>
-                  <div>Delete Video</div>
+                  <div id="channelHeaderText"></div>
                 </div>
-              )}
+                {ownChannel && (
+                  <div id="channelHeaderButtons">
+                    <div
+                      onClick={() =>
+                        startTransition(() => setUploadVideo(true))
+                      }
+                    >
+                      Upload Video
+                    </div>
+                    <div>Delete Video</div>
+                  </div>
+                )}
+              </div>
+              <div id="channelHeaderBottom">
+                <div>HOME</div>
+                <div>VIDEOS</div>
+                <div>ABOUT</div>
+              </div>
             </div>
-            <div id="channelHeaderBottom"></div>
           </div>
-          {uploadVideo && <UploadVideo />}
           <div id="contentPreview">{videos}</div>
         </div>
       ) : noUser ? (
@@ -151,6 +158,7 @@ function Channel() {
       ) : (
         <div>loading info</div>
       )}
+      {uploadVideo && <UploadVideo setUploadVideo={setUploadVideo} />}
     </div>
   );
 }
