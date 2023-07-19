@@ -6,7 +6,7 @@ import { limit, orderBy, startAfter } from "firebase/firestore";
 
 function CommentSection({ id, user }) {
   const [lastVisible, setLastVisible] = useState();
-  const [parsedComment, setParsedComments] = useState();
+  const [parsedComment, setParsedComments] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
   const [currentCount, setCurrentCount] = useState(0);
   const [scrollCheck, setScrollCheck] = useState(true);
@@ -123,7 +123,14 @@ function CommentSection({ id, user }) {
       <div id="commentCount">
         {commentCount} {`Comment${commentCount === 1 ? "" : "s"}`}
       </div>
-      <CommentInput id={id} user={user} startingComment={true} />
+      <CommentInput
+        id={id}
+        user={user}
+        startingComment={true}
+        setParsedComments={setParsedComments}
+        parsedComments={parsedComment}
+        neededForReplies={false}
+      />
       <div id="commentPreview">{parsedComment}</div>
       {commentCount - currentCount > 0 ? (
         <div id="bottomPage" ref={bottomRef}></div>

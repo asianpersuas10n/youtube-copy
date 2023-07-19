@@ -6,12 +6,22 @@ import {
   useRef,
   useEffect,
 } from "react";
+import Comment from "./Comment";
 import FirebaseFirestore from "../FirebaseFirestore";
 import FirebaseAuth from "../FirebaseAuth";
 import { db } from "../FirebaseConfig";
 import { StoreContext } from "../Components/Data";
 
-function CommentInput({ id, user, startingComment, repliesId, videoId }) {
+function CommentInput({
+  id,
+  user,
+  startingComment,
+  repliesId,
+  videoId,
+  parsedComments,
+  setParsedComments,
+  neededForReplies,
+}) {
   const { inputFocusStore, userStore } = useContext(StoreContext);
   const setInputFocus = inputFocusStore[1];
   const [userData] = userStore;
@@ -36,7 +46,47 @@ function CommentInput({ id, user, startingComment, repliesId, videoId }) {
         await updateDoc(doc(db, `${videoId}startingComments`, id), {
           replies: collectionString,
         });
+      setParsedComments([
+        <div
+          key={Number(`${Date.now()}`)}
+          className={startingComment ? "commentContent" : "replyComment"}
+        >
+          <Comment
+            startingComment={startingComment}
+            commentInfo={{
+              likes: 0,
+              replies: [],
+              text: commentInput,
+              userID: user.uid,
+            }}
+            id={videoId}
+            currentUser={userData}
+          />
+        </div>,
+        ...parsedComments,
+      ]);
       setCommentInput("");
+      if (neededForReplies) {
+        /*
+         *                neededForReplies={{
+                  repliesLength: repliesLength,
+                  setRepliesLength: setRepliesLength,
+                  setRepliesBool: setRepliesBool,
+                  currentReplies: currentReplies,
+                  setCurrentReplies: setCurrentReplies,
+                }}
+        */
+        neededForReplies.setRepliesExist(true);
+        neededForReplies.setRepliesBool(true);
+        if (neededForReplies.repliesLength === 0) {
+          neededForReplies.setRepliesLength(neededForReplies.repliesLength + 1);
+        }
+        if (neededForReplies.currentReplies === 0) {
+          neededForReplies.setCurrentReplies(
+            neededForReplies.currentReplies + 1
+          );
+        }
+      }
     } catch (error) {
       console.log(error);
     }

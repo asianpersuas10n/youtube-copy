@@ -15,10 +15,13 @@ import { storage } from "../FirebaseConfig";
 import FirebaseFirestore from "../FirebaseFirestore";
 import { StoreContext } from "../Components/Data";
 import { ReactComponent as X } from "../SVGs/x.svg";
+import { serverTimestamp } from "firebase/firestore";
 
-function UploadVideo({ setUploadVideo }) {
+function UploadVideo({ setUploadVideo, formatVideos }) {
   const { userStore } = useContext(StoreContext);
   const [user] = userStore;
+  const [videoStore, setVideoStore] = useState(null);
+  const [disableUpload, setDisableUpload] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(-1);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -49,10 +52,9 @@ function UploadVideo({ setUploadVideo }) {
       const tempID = isCurrentUser.docs.map((doc) => {
         return doc.id;
       });
-      const url = await uploadFile(videoFileRef.current.files[0]);
+      const url = await uploadFile(videoStore);
       const urls = await uploadImages(images, url);
-
-      FirebaseFirestore.uploadVideo(tempID[0], url, {
+      const info = {
         duration: duration,
         views: 0,
         title: title,
@@ -60,7 +62,11 @@ function UploadVideo({ setUploadVideo }) {
         scrubImages: urls,
         thumbnail: urls[0],
         user: user.uid,
-      });
+      };
+
+      FirebaseFirestore.uploadVideo(tempID[0], url, info);
+      info.time = await serverTimestamp();
+      formatVideos([info]);
     } catch (error) {
       console.log(error);
     }
@@ -155,6 +161,7 @@ function UploadVideo({ setUploadVideo }) {
         }, 250);
         setTimeout(() => {
           setTest2(true);
+          setDisableUpload(false);
         }, 1499);
       }
     }
@@ -163,6 +170,7 @@ function UploadVideo({ setUploadVideo }) {
   }
 
   async function fileCheck() {
+    setDisableUpload(true);
     const file = videoFileRef.current.files[0];
     const regexTest = /video\//;
     startTransition(() => setImages([]));
@@ -174,10 +182,14 @@ function UploadVideo({ setUploadVideo }) {
       }
     } catch (error) {
       console.log(error);
-      startTransition(() => setUploadVideo(false));
+      startTransition(() => {
+        setDisableUpload(false);
+        setUploadVideo(false);
+      });
       alert("Something went wrong. Try again.");
       return;
     }
+    videoFileButtonRef.current.classList.toggle("startAnimation");
     speedLinesRef.current.classList.toggle("startAnimation");
     arrowUnderlineRef.current.classList.toggle("startAnimation");
     smokeRef.current.classList.toggle("startAnimation");
@@ -201,6 +213,7 @@ function UploadVideo({ setUploadVideo }) {
       });
     const getImages = await videoDuration(file);
     getImages();
+    setVideoStore(file);
   }
 
   // sets the height of the text area based on the height of its content
@@ -249,6 +262,7 @@ function UploadVideo({ setUploadVideo }) {
                 e.stopPropagation();
               }}
               onDrop={(e) => {
+                if (disableUpload) return;
                 e.preventDefault();
                 e.stopPropagation();
                 toggleActive();
@@ -259,7 +273,7 @@ function UploadVideo({ setUploadVideo }) {
               <label
                 htmlFor="videoFileInput"
                 onClick={(e) => {
-                  if (!e.target.classList.contains("ignore")) {
+                  if (!e.target.classList.contains("ignore") || disableUpload) {
                     e.preventDefault();
                   }
                 }}
@@ -301,8 +315,12 @@ function UploadVideo({ setUploadVideo }) {
                 <div>
                   <label
                     id="videoFileInputButton"
+                    ref={videoFileButtonRef}
                     onClick={(e) => {
                       e.target.classList.add("clicked");
+                      if (disableUpload) {
+                        e.preventDefault();
+                      }
                     }}
                     onAnimationEnd={(e) => {
                       e.target.classList.remove("clicked");
@@ -317,6 +335,7 @@ function UploadVideo({ setUploadVideo }) {
                       onChange={() => fileCheck()}
                       id="videoFileInput"
                       className="ignore"
+                      disabled={disableUpload}
                     ></input>
                   </label>
                 </div>

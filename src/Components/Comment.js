@@ -9,9 +9,10 @@ import { ReactComponent as DirectionalArrow } from "../SVGs/directionalArrow.svg
 import { ReactComponent as Return } from "../SVGs/return.svg";
 
 function Comment({ startingComment, commentInfo, id, currentUser }) {
-  const [replies, setReplies] = useState();
+  const [replies, setReplies] = useState([]);
   const [repliesLength, setRepliesLength] = useState(0);
   const [currentReplies, setCurrentReplies] = useState(0);
+  const [repliesExist, setRepliesExist] = useState(false);
   const [repliesBool, setRepliesBool] = useState(false);
   const [user, setUser] = useState({ displayName: "" });
   const [replyBool, setReplyBool] = useState(false);
@@ -41,7 +42,7 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
     if (!repliesId) return;
     const count = await FirebaseFirestore.count(repliesId);
     const parsedCount = count.data().count;
-    setReplies(true);
+    setRepliesExist(true);
     setRepliesLength(parsedCount);
   }
 
@@ -59,7 +60,19 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
         return commentData;
       });
       setLastVisible(commentCollection.docs[commentCollection.docs.length - 1]);
-      setReplies(tempComments);
+      setReplies(
+        tempComments.map((info, i) => {
+          return (
+            <div key={Number(`${Date.now()}${i}`)} className="replyComment">
+              <Comment
+                startingComment={false}
+                commentInfo={info}
+                id={commentInfo.commentId}
+              />
+            </div>
+          );
+        })
+      );
       setRepliesBool(true);
       setCurrentReplies(tempComments.length + currentReplies);
       setRepliesLoaded(true);
@@ -85,7 +98,20 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
         return commentData;
       });
       setLastVisible(commentCollection.docs[commentCollection.docs.length - 1]);
-      setReplies([...previousReplies, ...tempComments]);
+      setReplies([
+        ...previousReplies,
+        ...tempComments.map((info, i) => {
+          return (
+            <div key={Number(`${Date.now()}${i}`)} className="replyComment">
+              <Comment
+                startingComment={false}
+                commentInfo={info}
+                id={commentInfo.commentId}
+              />
+            </div>
+          );
+        }),
+      ]);
       setCurrentReplies(tempComments.length + previousLength);
     } catch (error) {
       console.log(error);
@@ -148,9 +174,19 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
                 startingComment={false}
                 repliesId={commentInfo.replies}
                 videoId={id}
+                parsedComments={replies}
+                setParsedComments={setReplies}
+                neededForReplies={{
+                  repliesLength: repliesLength,
+                  setRepliesLength: setRepliesLength,
+                  setRepliesBool: setRepliesBool,
+                  currentReplies: currentReplies,
+                  setCurrentReplies: setCurrentReplies,
+                  setRepliesExist: setRepliesExist,
+                }}
               />
             )}
-            {startingComment && replies && (
+            {startingComment && repliesExist && (
               <div>
                 {repliesLength && (
                   <div>
@@ -176,22 +212,7 @@ function Comment({ startingComment, commentInfo, id, currentUser }) {
                     </div>
                   </div>
                 )}
-                {repliesBool
-                  ? replies.map((info, i) => {
-                      return (
-                        <div
-                          key={Number(`${Date.now()}${i}`)}
-                          className="replyComment"
-                        >
-                          <Comment
-                            startingComment={false}
-                            commentInfo={info}
-                            id={commentInfo.commentId}
-                          />
-                        </div>
-                      );
-                    })
-                  : null}
+                {repliesBool ? replies : null}
                 {repliesBool && repliesLength - currentReplies > 0 && (
                   <div
                     className="svgContainer navButtons commentMoreReplies"

@@ -14,6 +14,7 @@ function Channel() {
   const [ownChannel, setOwnChannel] = useState(false);
   const [userData, setUserData] = useState();
   const [noUser, setNoUser] = useState(false);
+  const [prefilteredVideos, setPrefilteredVideos] = useState([]);
   const [videos, setVideos] = useState([]);
   const navigate = useNavigate();
 
@@ -48,10 +49,9 @@ function Channel() {
   //gets all of a users video information
   async function getUsersVideos(url) {
     try {
-      console.log(url);
       const promises = [];
       for (let i = 0; i < url.length; i++) {
-        const queries = [{ field: "url", condition: "==", value: url[0] }];
+        const queries = [{ field: "url", condition: "==", value: url[i] }];
         promises.push(
           FirebaseFirestore.readDocuments({
             collectionType: "videos",
@@ -72,7 +72,7 @@ function Channel() {
   // sets up formating for called videos
   function formatVideos(videosArr) {
     const tempVideos = videosArr.map((data, i) => {
-      const index = Number(500 + `${i}`);
+      const index = Number(500 + `${i}${Math.random() * (9 - 0)}`);
       return (
         <div
           className="contentContainer"
@@ -105,7 +105,8 @@ function Channel() {
         </div>
       );
     });
-    setVideos(tempVideos);
+    setVideos([...tempVideos, ...prefilteredVideos]);
+    setPrefilteredVideos([...tempVideos, ...prefilteredVideos]);
   }
 
   // runs on page start
@@ -158,7 +159,12 @@ function Channel() {
       ) : (
         <div>loading info</div>
       )}
-      {uploadVideo && <UploadVideo setUploadVideo={setUploadVideo} />}
+      {uploadVideo && (
+        <UploadVideo
+          formatVideos={formatVideos}
+          setUploadVideo={setUploadVideo}
+        />
+      )}
     </div>
   );
 }

@@ -5,7 +5,12 @@ function reduceTime(totalTime, time) {
 }
 
 function generateUploadDate(previousDate) {
-  const difference = currentTime.getTime() - previousDate.toDate().getTime();
+  let difference;
+  try {
+    difference = currentTime.getTime() - previousDate.toDate().getTime();
+  } catch {
+    difference = 100;
+  }
   let generatedTime;
   switch (true) {
     case difference <= 120000:
@@ -21,7 +26,7 @@ function generateUploadDate(previousDate) {
       generatedTime = `${reduceTime(difference, 86400000)} days ago`;
       break;
     case difference > 604800000 && difference <= 2628000000:
-      generatedTime = `${reduceTime(difference, 6048000000)} weeks ago`;
+      generatedTime = `${reduceTime(difference, 604800000)} weeks ago`;
       break;
     case difference > 2628000000 && difference <= 31540000000:
       generatedTime = `${reduceTime(difference, 2628000000)} months ago`;
