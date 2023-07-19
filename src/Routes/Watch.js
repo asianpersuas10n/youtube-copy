@@ -8,7 +8,6 @@ import {
 import Navbar from "../Components/Navbar";
 import Controls from "../Components/Controls";
 import CommentSection from "../Components/CommentSection";
-import video from "../TestVideo/testVideo.mp4";
 import { StoreContext } from "../Components/Data";
 import { storage } from "../FirebaseConfig";
 import { getDownloadURL, ref } from "firebase/storage";
