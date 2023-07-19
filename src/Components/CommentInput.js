@@ -30,6 +30,7 @@ function CommentInput({
   const confirmRef = useRef(null);
   const buttonsRef = useRef(null);
 
+  // uploads the comment info to firebase empties the input and create the comment
   async function uploadComment() {
     try {
       const collectionString = startingComment
@@ -67,15 +68,6 @@ function CommentInput({
       ]);
       setCommentInput("");
       if (neededForReplies) {
-        /*
-         *                neededForReplies={{
-                  repliesLength: repliesLength,
-                  setRepliesLength: setRepliesLength,
-                  setRepliesBool: setRepliesBool,
-                  currentReplies: currentReplies,
-                  setCurrentReplies: setCurrentReplies,
-                }}
-        */
         neededForReplies.setRepliesExist(true);
         neededForReplies.setRepliesBool(true);
         if (neededForReplies.repliesLength === 0) {
@@ -92,6 +84,7 @@ function CommentInput({
     }
   }
 
+  // stylizes the input field if user has text in it
   useEffect(() => {
     if (commentInput && !confirmRef.current?.className.includes("active")) {
       confirmRef.current?.classList.toggle("active");

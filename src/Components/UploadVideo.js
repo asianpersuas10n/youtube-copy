@@ -42,6 +42,7 @@ function UploadVideo({ setUploadVideo, formatVideos }) {
   const speedLinesRef = useRef(null);
   const fireStorage = storage;
 
+  // uploads the video and creates a content contianer on the page
   async function handleUpload() {
     try {
       const queries = [{ field: "uid", condition: "==", value: user.uid }];
@@ -65,13 +66,14 @@ function UploadVideo({ setUploadVideo, formatVideos }) {
       };
 
       FirebaseFirestore.uploadVideo(tempID[0], url, info);
-      info.time = await serverTimestamp();
+      info.time = serverTimestamp();
       formatVideos([info]);
     } catch (error) {
       console.log(error);
     }
   }
 
+  // uploads the images taken
   async function uploadImages(arr, link) {
     const promises = [];
     for (let i = 0; i < arr.length; i++) {
@@ -91,6 +93,7 @@ function UploadVideo({ setUploadVideo, formatVideos }) {
     return urlArr;
   }
 
+  // uploads the video
   async function uploadFile(file) {
     if (file === null) {
       alert("no file");
@@ -130,6 +133,7 @@ function UploadVideo({ setUploadVideo, formatVideos }) {
     });
   }
 
+  // creates a canvas to takes images for the thumbnail and for scrubbing
   function getImagesForVideo(video) {
     const videoDuration = video.duration;
     const imagesNeeded = videoDuration > 61 ? 12 : 6;
@@ -169,6 +173,11 @@ function UploadVideo({ setUploadVideo, formatVideos }) {
     setTestVideo(video.src);
   }
 
+  /*
+   * disables files from being uploaded after an upload starts
+   * checks to make sure nothing not a video or too big is passed and
+   * handles the start of the animation
+   */
   async function fileCheck() {
     setDisableUpload(true);
     const file = videoFileRef.current.files[0];
